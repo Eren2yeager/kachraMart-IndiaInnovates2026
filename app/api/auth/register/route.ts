@@ -6,7 +6,7 @@ import { isValidEmail, isValidPhone } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password, role, phone } = await req.json();
+    const { name, email, password, role, phone, location } = await req.json();
 
     // Validation
     if (!name || !email || !password) {
@@ -59,13 +59,28 @@ export async function POST(req: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create user
+    // Create user with a valid GeoJSON Point location
+    const defaultCoordinates: [number, number] = [0, 0]; // [lng, lat]
+    const userLocation =
+      location && Array.isArray(location.coordinates) && location.coordinates.length === 2
+        ? {
+            type: 'Point',
+            coordinates: location.coordinates as [number, number],
+            address: location.address ?? '',
+          }
+        : {
+            type: 'Point',
+            coordinates: defaultCoordinates,
+            address: '',
+          };
+
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
       role: role || 'citizen',
       phone,
+      location: userLocation,
     });
 
     // Return user without password

@@ -1,0 +1,49 @@
+import Link from "next/link";
+import { SignUpForm } from "@/components/auth/SignUpForm";
+import LightRays from "@/components/ui/LightRays";
+import { APP_NAME } from "@/config/constants";
+
+export default function SignUpPage() {
+  return (
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-4">
+      <div className="pointer-events-none absolute inset-0 opacity-60">
+        <LightRays
+          className="w-full h-full"
+          raysOrigin="top-center"
+          raysColor="#22c55e"
+          raysSpeed={0.5}
+          lightSpread={1.1}
+          rayLength={1.6}
+          fadeDistance={1.2}
+          saturation={1.05}
+          followMouse={false}
+          mouseInfluence={0}
+          noiseAmount={0.03}
+          distortion={0.08}
+        />
+      </div>
+
+
+      <div className="relative z-10 w-full max-w-md space-y-4">
+        <div className="text-center mb-2">
+          <p className="text-xs uppercase tracking-wide text-emerald-700 font-semibold">
+            {APP_NAME}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Create your role-based workspace in the circular waste network.
+          </p>
+        </div>
+        <SignUpForm />
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/auth/signin"
+            className="text-primary hover:underline font-medium"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

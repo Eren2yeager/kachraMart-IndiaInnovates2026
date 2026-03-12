@@ -121,8 +121,8 @@ export function AppShell({ children }: AppShellProps) {
     <SidebarProvider>
       <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
-          <div className="flex items-center gap-2 px-2 py-1">
-            <div className="h-8 w-8 rounded-full bg-background flex items-center justify-center overflow-hidden border border-border">
+          <div className="flex items-center gap-2 ">
+            <div className="h-8 min-w-8 rounded-full bg-background flex items-center justify-center overflow-hidden border border-border">
               <img
                 src="/favicon.svg"
                 alt={APP_NAME}
@@ -171,7 +171,6 @@ export function AppShell({ children }: AppShellProps) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <SidebarSeparator />
           <div className="flex items-center gap-2 px-2 py-1">
             <UserAvatar
               name={user.name || "User"}
@@ -192,7 +191,6 @@ export function AppShell({ children }: AppShellProps) {
             </div>
           </div>
         </SidebarFooter>
-          <SidebarSeparator />
       </Sidebar>
       <SidebarInset>
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">

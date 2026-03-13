@@ -193,8 +193,8 @@ export function AppShell({ children }: AppShellProps) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
-          <header className="border-b bg-background/80 backdrop-blur flex items-center justify-between px-4 py-3 md:px-6">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 relative">
+          <header className="border-b bg-background/80 backdrop-blur flex items-center justify-between px-4 py-3 md:px-6 sticky top-0">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
               <div className="flex flex-col">
@@ -227,10 +227,10 @@ export function AppShell({ children }: AppShellProps) {
           <main className="flex-1 px-4 py-4 md:px-8 md:py-8">
             {children}
           </main>
-          <footer className="border-t bg-background/80 backdrop-blur px-4 py-3 md:px-6 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+          {/* <footer className="border-t bg-background/80 backdrop-blur px-4 py-3 md:px-6 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
             <span>© {new Date().getFullYear()} {APP_NAME}. All rights reserved.</span>
             <span>Phases 1–2 live · Phases 3–6 coming soon.</span>
-          </footer>
+          </footer> */}
         </div>
       </SidebarInset>
     </SidebarProvider>

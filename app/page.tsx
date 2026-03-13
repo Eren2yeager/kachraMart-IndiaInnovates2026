@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,19 +10,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Lightbulb, Recycle, Leaf, TrendingUp, Users } from "lucide-react";
+import {
+  Lightbulb,
+  Recycle,
+  Leaf,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import LightRays from "@/components/ui/LightRays";
 import { APP_NAME, APP_DESCRIPTION } from "@/config/constants";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 
 export default function HomePage() {
+  const { data: session } = useSession();
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 md:px-10 md:pt-10">
       {/* Light rays background */}
       <div className="pointer-events-none absolute inset-0 opacity-70">
         <LightRays
           className="w-full h-full"
           raysOrigin="top-center"
-          raysColor="#22c55e"
+          raysColor="#11d459"
           raysSpeed={0.6}
           lightSpread={1.2}
           rayLength={1.8}
@@ -36,12 +46,13 @@ export default function HomePage() {
 
       {/* Top and bottom blur to soften edges */}
 
-
       <div className="relative z-10 container mx-auto px-4 py-10 md:py-16">
+        {/* Header with user profile */}
+
         {/* Hero Section */}
         <div className="grid gap-10 md:grid-cols-2 items-center mb-16">
           <div className="space-y-6">
-            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs">
+            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-sm">
               Phase 1–2 live · AI classification ready
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
@@ -53,17 +64,40 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-xl">
-              Use computer vision and optimized logistics to turn city waste into
-              a transparent, trackable resource stream for citizens, collectors,
-              recyclers, and administrators.
+              Use computer vision and optimized logistics to turn city waste
+              into a transparent, trackable resource stream for citizens,
+              collectors, recyclers, and administrators.
             </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Button asChild size="lg">
-                <Link href="/auth/signup">Get started for free</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/auth/signin">Sign in to your workspace</Link>
-              </Button>
+            <div className="flex flex-wrap  gap-3 pt-2">
+              {session ? (
+                <>
+                  <Button asChild size="lg">
+                    <Link href="/dashboard" className="flex justify-start items-center gap-2">
+                      <UserAvatar
+                        name={session.user?.name}
+                        image={session.user?.image}
+                        size="sm"
+                      />
+                      <div>
+
+                      Go to Dashboard
+                      </div>
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/api/auth/signout">Sign out</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild size="lg">
+                    <Link href="/auth/signup">Get started for free</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/auth/signin">Sign in</Link>
+                  </Button>
+                </>
+              )}
             </div>
             <div className="flex flex-wrap gap-4 pt-4 text-xs md:text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
@@ -91,43 +125,35 @@ export default function HomePage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-xs md:text-sm">
                   <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-3 space-y-1">
-                    <p className="font-semibold text-emerald-700">
-                      Citizens
-                    </p>
+                    <p className="font-semibold text-emerald-700">Citizens</p>
                     <p className="text-emerald-900/80">
-                      Classify waste with AI and (soon) request doorstep
-                      pickups with reward points.
+                      Classify waste with AI and (soon) request doorstep pickups
+                      with reward points.
                     </p>
                   </div>
                   <div className="rounded-lg bg-sky-50 border border-sky-100 p-3 space-y-1">
-                    <p className="font-semibold text-sky-700">
-                      Collectors
-                    </p>
+                    <p className="font-semibold text-sky-700">Collectors</p>
                     <p className="text-sky-900/80">
                       Get optimized pickup routes and live task dashboards.
                     </p>
                   </div>
                   <div className="rounded-lg bg-violet-50 border border-violet-100 p-3 space-y-1">
-                    <p className="font-semibold text-violet-700">
-                      Dealers
-                    </p>
+                    <p className="font-semibold text-violet-700">Dealers</p>
                     <p className="text-violet-900/80">
                       Browse verified inventory and manage purchase orders.
                     </p>
                   </div>
                   <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 space-y-1">
-                    <p className="font-semibold text-slate-800">
-                      Admins
-                    </p>
+                    <p className="font-semibold text-slate-800">Admins</p>
                     <p className="text-slate-700/80">
                       Monitor hubs, waste flow, and sustainability impact.
                     </p>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Current demo flow: sign up → choose role → dashboard →
-                  citizen AI classification. Remaining roadmap surfaces are
-                  visible in the app as &quot;Coming soon&quot; screens.
+                  Current demo flow: sign up → choose role → dashboard → citizen
+                  AI classification. Remaining roadmap surfaces are visible in
+                  the app as &quot;Coming soon&quot; screens.
                 </p>
               </CardContent>
             </Card>
@@ -177,14 +203,19 @@ export default function HomePage() {
         {/* CTA Section */}
         <div className="text-center space-y-4">
           <h2 className="text-2xl md:text-3xl font-bold">
-            Ready to test the AI flow?
+            {session
+              ? "Welcome back to KachraMart!"
+              : "Ready to test the AI flow?"}
           </h2>
           <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-            Create a citizen account, upload a waste image, and see how the
-            platform classifies and explains your waste category.
+            {session
+              ? "Continue managing your waste classification and sustainability impact."
+              : "Create a citizen account, upload a waste image, and see how the platform classifies and explains your waste category."}
           </p>
           <Button asChild size="lg">
-            <Link href="/auth/signup">Create your KachraMart account</Link>
+            <Link href={session ? "/dashboard" : "/auth/signup"}>
+              {session ? "Go to Dashboard" : "Create your KachraMart account"}
+            </Link>
           </Button>
         </div>
       </div>

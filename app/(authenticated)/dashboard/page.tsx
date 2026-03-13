@@ -1,7 +1,11 @@
-'use client';
+"use client";
 
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -20,34 +24,146 @@ import {
   Recycle,
   Truck,
   BarChart3,
+  Edit2,
+  Check,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { animations } from "@/lib/theme";
 import { USER_ROLES } from "@/config/constants";
 import Link from "next/link";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    phone: user?.phone || "",
+  });
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    user?.image || null,
+  );
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [error, setError] = useState("");
 
   if (!user) return null;
 
   const roleConfig = USER_ROLES[user.role];
 
+  const handleSave = async () => {
+    setError("");
+    setIsSaving(true);
+
+    try {
+      let imageUrl = user?.image;
+
+      // Upload image if a new one was selected
+      if (imageFile) {
+        const imageFormData = new FormData();
+        imageFormData.append("file", imageFile);
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: imageFormData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const uploadData = await uploadResponse.json();
+        imageUrl = uploadData.url;
+      }
+
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          image: imageUrl,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update profile");
+      }
+
+      setIsEditing(false);
+      // Optionally refresh the page or update local state
+      window.location.reload();
+    } catch (err: any) {
+      setError(err.message || "Failed to update profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      name: user?.name || "",
+      phone: user?.phone || "",
+    });
+    setImagePreview(user?.image || null);
+    setImageFile(null);
+    setIsEditing(false);
+    setError("");
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setError("Please select a valid image file");
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        return;
+      }
+
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setError("");
+    }
+  };
+
   return (
     <div className="space-y-8">
       <motion.div {...animations.fadeIn} className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">
-              Welcome back, {user.name}!
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              You&apos;re signed in as a {roleConfig.label}. Phase 1–2 features
-              are live; the rest of the circular flow is visible as{" "}
-              <span className="font-medium">Coming soon</span> screens.
-            </p>
+          <div className="flex items-center gap-3">
+            <UserAvatar
+              name={user.name || "User"}
+              image={user.image || undefined}
+              role={user.role}
+              size="lg"
+            />
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold">
+                Welcome back, {user.name}!
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                You&apos;re signed in as a {roleConfig.label}. Phase 1–2
+                features are live; the rest of the circular flow is visible as{" "}
+                <span className="font-medium">Coming soon</span> screens.
+              </p>
+            </div>
           </div>
-          <Button variant="outline" onClick={() => signOut({ callbackUrl: '/' })}>
+          <Button
+            variant="outline"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Sign Out
           </Button>
@@ -55,50 +171,185 @@ export default function DashboardPage() {
 
         {/* Profile */}
         <Card>
-          <CardHeader>
-            <CardTitle>Your Profile</CardTitle>
-            <CardDescription>Your account information</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Your Profile</CardTitle>
+              <CardDescription>Your account information</CardDescription>
+            </div>
+            {!isEditing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+              >
+                <Edit2 className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <User className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Name</p>
-                <p className="text-sm text-muted-foreground">{user.name}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Email</p>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Role</p>
-                <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
-              </div>
-            </div>
-
-            {user.verified && (
-              <div className="flex items-center gap-2 text-green-600">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            {isEditing ? (
+              <div className="space-y-4">
+                <Badge
+                  variant="outline"
+                  className="text-[10px] md:text-xs border-amber-300 bg-amber-50 text-amber-700"
                 >
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm font-medium">Verified Account</span>
+                 You will need to signin again for changes to take effect.
+                </Badge>
+                <div className="space-y-2">
+                  <Label>Profile Picture</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <UserAvatar
+                        name={formData.name || user.name || "User"}
+                        image={imagePreview || undefined}
+                        role={user.role}
+                        size="lg"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="block w-full text-sm text-gray-500
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-md file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-blue-50 file:text-blue-700
+                          hover:file:bg-blue-100"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        PNG, JPG up to 5MB
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                    placeholder="Your phone number"
+                  />
+                </div>
+
+                {error && (
+                  <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                    {error}
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="flex-1"
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    {isSaving ? "Saving..." : "Save"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isSaving}
+                    className="flex-1"
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel
+                  </Button>
+                </div>
               </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Name</p>
+                    <p className="text-sm text-muted-foreground">{user.name}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Email</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+
+                {user.phone && (
+                  <div className="flex items-center gap-3">
+                    <svg
+                      className="h-5 w-5 text-muted-foreground"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium">Phone</p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.phone}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <Shield className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Role</p>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      {user.role}
+                    </p>
+                  </div>
+                </div>
+
+                {user.verified && (
+                  <div className="flex items-center gap-2 text-green-600">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-medium">
+                      Verified Account
+                    </span>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>

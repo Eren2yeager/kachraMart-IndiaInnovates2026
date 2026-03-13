@@ -6,7 +6,7 @@ import { isValidEmail, isValidPhone } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password, role, phone, location } = await req.json();
+    const { name, email, password, role, phone, location, image } = await req.json();
 
     // Validation
     if (!name || !email || !password) {
@@ -74,6 +74,12 @@ export async function POST(req: NextRequest) {
             address: '',
           };
 
+    const generatedImage =
+      image ||
+      `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(
+        name
+      )}&backgroundColor=22c55e,0ea5e9&fontSize=40`;
+
     const user = await User.create({
       name,
       email,
@@ -81,6 +87,7 @@ export async function POST(req: NextRequest) {
       role: role || 'citizen',
       phone,
       location: userLocation,
+      image: generatedImage,
     });
 
     // Return user without password
@@ -90,6 +97,7 @@ export async function POST(req: NextRequest) {
       email: user.email,
       role: user.role,
       phone: user.phone,
+      image: user.image,
     };
 
     return NextResponse.json(

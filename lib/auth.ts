@@ -79,12 +79,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.id = dbUser._id.toString();
           token.role = dbUser.role;
           token.verified = dbUser.verified || false;
+          token.name = dbUser.name;
+          token.email = dbUser.email;
+          token.picture = dbUser.image;
         }
       }
 
       if (trigger === 'update' && session) {
         token.role = session.role;
         token.name = session.name;
+        if (session.image) {
+          token.picture = session.image;
+        }
       }
 
       return token;
@@ -94,6 +100,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
         session.user.verified = token.verified as boolean;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
+        // NextAuth stores image on token.picture for JWT strategy
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        session.user.image = (token as any).picture as string | undefined;
       }
 
       return session;

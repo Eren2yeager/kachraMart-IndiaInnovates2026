@@ -5,10 +5,10 @@ import { uploadImage } from '@/lib/cloudinary';
 export async function POST(req: NextRequest) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // const session = await auth();
+    // if (!session?.user) {
+    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // }
 
     const formData = await req.formData();
     const file = formData.get('file') as File;

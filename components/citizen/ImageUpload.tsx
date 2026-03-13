@@ -2,20 +2,22 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Upload, Loader2, X, Plus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { animations } from '@/lib/theme';
 
 interface ImageUploadProps {
   onImageUploaded: (url: string) => void;
+  onImageRemoved?: () => void;
   isLoading?: boolean;
 }
 
-export function ImageUpload({ onImageUploaded, isLoading }: ImageUploadProps) {
-  const [preview, setPreview] = useState<string | null>(null);
+export function ImageUpload({ onImageUploaded, onImageRemoved, isLoading }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const [hasImage, setHasImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,13 +38,6 @@ export function ImageUpload({ onImageUploaded, isLoading }: ImageUploadProps) {
       return;
     }
 
-    // Show preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-
     // Upload to server
     setUploading(true);
     try {
@@ -60,21 +55,82 @@ export function ImageUpload({ onImageUploaded, isLoading }: ImageUploadProps) {
         throw new Error(data.error || 'Upload failed');
       }
 
+      setHasImage(true);
       onImageUploaded(data.url);
     } catch (err: any) {
       setError(err.message || 'Failed to upload image');
-      setPreview(null);
     } finally {
       setUploading(false);
     }
   };
 
+  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setIsDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      setError(null);
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file');
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image size must be less than 10MB');
+        return;
+      }
+
+      // Upload to server
+      setUploading(true);
+      fetch('/api/upload', {
+        method: 'POST',
+        body: (() => {
+          const formData = new FormData();
+          formData.append('file', file);
+          return formData;
+        })(),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.url) {
+            throw new Error(data.error || 'Upload failed');
+          }
+          setHasImage(true);
+          onImageUploaded(data.url);
+        })
+        .catch((err: any) => {
+          setError(err.message || 'Failed to upload image');
+        })
+        .finally(() => {
+          setUploading(false);
+        });
+    }
+  };
+
   const handleRemove = () => {
-    setPreview(null);
     setError(null);
+    setHasImage(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    onImageRemoved?.();
   };
 
   const handleClick = () => {
@@ -92,18 +148,35 @@ export function ImageUpload({ onImageUploaded, isLoading }: ImageUploadProps) {
         disabled={uploading || isLoading}
       />
 
-      {!preview ? (
+      {uploading ? (
+        <motion.div {...animations.fadeIn}>
+          <Card className="border-2 border-dashed border-primary/50 bg-primary/5">
+            <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+              <p className="text-sm font-medium">Uploading...</p>
+            </div>
+          </Card>
+        </motion.div>
+      ) : !hasImage ? (
         <motion.div {...animations.fadeIn}>
           <Card
-            className="border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer"
-            onClick={handleClick}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`border-2 border-dashed transition-colors cursor-pointer ${
+              isDragActive
+                ? 'border-primary/80 bg-primary/5'
+                : 'border-muted-foreground/25 hover:border-primary/50'
+            }`}
           >
-            <div className="p-12 flex flex-col items-center justify-center text-center">
-              <div className="rounded-full bg-primary/10 p-4 mb-4">
-                <Upload className="h-8 w-8 text-primary" />
+            <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center">
+              <div className="rounded-full bg-primary/10 p-3 md:p-4 mb-3 md:mb-4">
+                <Upload className="h-6 md:h-8 w-6 md:w-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Upload Waste Image</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <h3 className="text-base md:text-lg font-semibold mb-2">Upload Waste Image</h3>
+              <p className="text-xs md:text-sm text-muted-foreground mb-2 md:mb-4">
                 Click to select or drag and drop an image
               </p>
               <p className="text-xs text-muted-foreground">
@@ -113,33 +186,44 @@ export function ImageUpload({ onImageUploaded, isLoading }: ImageUploadProps) {
           </Card>
         </motion.div>
       ) : (
-        <motion.div {...animations.scale}>
-          <Card className="relative overflow-hidden">
-            <div className="aspect-video relative">
-              <img
-                src={preview}
-                alt="Waste preview"
-                className="w-full h-full object-cover"
-              />
-              {uploading && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                    <p className="text-sm">Uploading...</p>
-                  </div>
+        <motion.div {...animations.fadeIn}>
+          <Card className="border-2 border-green-200 bg-green-50">
+            <div className="p-6 md:p-8 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-green-100 p-2 flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
                 </div>
-              )}
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-semibold text-green-900">Image Uploaded</p>
+                  <p className="text-xs text-green-700 mt-1">Ready for classification</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 text-xs md:text-sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Upload New
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="flex-1 text-xs md:text-sm"
+                  onClick={handleRemove}
+                  disabled={isLoading}
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Remove
+                </Button>
+              </div>
             </div>
-            {!uploading && !isLoading && (
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-2 right-2"
-                onClick={handleRemove}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
           </Card>
         </motion.div>
       )}
@@ -147,7 +231,7 @@ export function ImageUpload({ onImageUploaded, isLoading }: ImageUploadProps) {
       {error && (
         <motion.div
           {...animations.slideDown}
-          className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md"
+          className="p-3 text-xs md:text-sm text-red-600 bg-red-50 border border-red-200 rounded-md"
         >
           {error}
         </motion.div>

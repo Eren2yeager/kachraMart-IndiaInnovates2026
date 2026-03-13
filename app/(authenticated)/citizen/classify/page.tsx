@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, ArrowRight, RotateCcw } from 'lucide-react';
+import { Sparkles, ArrowRight, RotateCcw, Download } from 'lucide-react';
 import { ImageUpload } from '@/components/citizen/ImageUpload';
 import { ClassificationResult } from '@/components/citizen/ClassificationResult';
 import { Button } from '@/components/ui/button';
@@ -12,15 +12,83 @@ import { ClassificationResult as ClassificationData } from '@/lib/roboflow';
 
 export default function ClassifyPage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
   const [classifying, setClassifying] = useState(false);
   const [result, setResult] = useState<ClassificationData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const handleImageUploaded = (url: string) => {
     setImageUrl(url);
     setResult(null);
     setError(null);
+    setImageDimensions(null);
   };
+
+  // Load image dimensions
+  useEffect(() => {
+    if (imageUrl && imageRef.current) {
+      const img = new Image();
+      img.onload = () => {
+        setImageDimensions({ width: img.width, height: img.height });
+      };
+      img.src = imageUrl;
+    }
+  }, [imageUrl]);
+
+  // Draw bounding boxes on canvas
+  useEffect(() => {
+    if (result && canvasRef.current && imageRef.current && imageDimensions) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Set canvas dimensions to match image
+      canvas.width = imageDimensions.width;
+      canvas.height = imageDimensions.height;
+
+      // Draw image
+      ctx.drawImage(imageRef.current, 0, 0);
+
+      // Draw bounding boxes
+      const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899'];
+      
+      result.allDetections.forEach((detection, index) => {
+        const color = colors[index % colors.length];
+        
+        // Calculate box coordinates
+        const x = detection.x - detection.width / 2;
+        const y = detection.y - detection.height / 2;
+        const width = detection.width;
+        const height = detection.height;
+
+        // Draw rectangle with thin lines
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, width, height);
+
+        // Draw label background
+        const label = `${detection.class} (${Math.round(detection.confidence * 100)}%)`;
+        ctx.font = 'bold 12px Arial';
+        const textMetrics = ctx.measureText(label);
+        const textHeight = 16;
+        const padding = 4;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(
+          x,
+          y - textHeight - padding,
+          textMetrics.width + padding * 2,
+          textHeight + padding
+        );
+
+        // Draw label text
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(label, x + padding, y - padding);
+      });
+    }
+  }, [result, imageDimensions]);
 
   const handleClassify = async () => {
     if (!imageUrl) return;
@@ -53,30 +121,45 @@ export default function ClassifyPage() {
     setImageUrl(null);
     setResult(null);
     setError(null);
+    setImageDimensions(null);
+  };
+
+  const downloadImage = () => {
+    if (canvasRef.current) {
+      const link = document.createElement('a');
+      link.href = canvasRef.current.toDataURL('image/png');
+      link.download = 'waste-classification.png';
+      link.click();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4 md:p-8">
-      <motion.div {...animations.fadeIn} className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4 md:p-6 lg:p-8">
+      <motion.div {...animations.fadeIn} className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl md:text-4xl font-bold">AI Waste Classification</h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">AI Waste Classification</h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             Upload an image and let AI identify the waste type automatically
           </p>
         </div>
 
-        {/* Main Content */}
-        {!result ? (
-          <div className="space-y-6">
+        {/* Main Content - Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Upload & Controls */}
+          <div className={`space-y-4 ${imageUrl ? 'lg:col-span-1' : 'lg:col-span-3'}`}>
             {/* Upload Section */}
-            <ImageUpload onImageUploaded={handleImageUploaded} isLoading={classifying} />
+            <ImageUpload 
+              onImageUploaded={handleImageUploaded} 
+              onImageRemoved={handleReset}
+              isLoading={classifying}
+            />
 
             {/* Classify Button */}
-            {imageUrl && !classifying && (
+            {imageUrl && !classifying && !result && (
               <motion.div {...animations.slideUp}>
                 <Button
                   size="lg"
@@ -84,9 +167,8 @@ export default function ClassifyPage() {
                   onClick={handleClassify}
                   disabled={classifying}
                 >
-                  <Sparkles className="mr-2 h-5 w-5" />
+                  <Sparkles className="mr-2 h-4 w-4" />
                   Classify Waste
-                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </motion.div>
             )}
@@ -95,15 +177,15 @@ export default function ClassifyPage() {
             {classifying && (
               <motion.div {...animations.scale}>
                 <Card>
-                  <CardContent className="py-12">
-                    <div className="text-center space-y-4">
-                      <div className="relative mx-auto w-16 h-16">
+                  <CardContent className="py-8">
+                    <div className="text-center space-y-3">
+                      <div className="relative mx-auto w-12 h-12">
                         <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
                         <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">Analyzing Image...</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="font-semibold text-sm md:text-base">Analyzing Image...</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">
                           AI is detecting waste items
                         </p>
                       </div>
@@ -117,75 +199,115 @@ export default function ClassifyPage() {
             {error && (
               <motion.div
                 {...animations.slideDown}
-                className="p-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg"
+                className="p-3 text-xs md:text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg"
               >
                 {error}
               </motion.div>
             )}
 
-            {/* Info Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">How It Works</CardTitle>
-                <CardDescription>AI-powered waste detection in 3 steps</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                      1
-                    </div>
-                    <div>
-                      <p className="font-medium">Upload Image</p>
-                      <p className="text-sm text-muted-foreground">
-                        Take a clear photo of your waste items
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                      2
-                    </div>
-                    <div>
-                      <p className="font-medium">AI Analysis</p>
-                      <p className="text-sm text-muted-foreground">
-                        Our AI detects and categorizes waste items
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                      3
-                    </div>
-                    <div>
-                      <p className="font-medium">Get Results</p>
-                      <p className="text-sm text-muted-foreground">
-                        View classification and request pickup
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Classification Results */}
-            <ClassificationResult result={result} />
+            {/* Result Actions */}
+            {result && (
+              <motion.div {...animations.slideUp} className="space-y-3">
 
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={handleReset}>
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Classify Another
-              </Button>
-              <Button className="flex-1">
-                <ArrowRight className="mr-2 h-4 w-4" />
-                Request Pickup
-              </Button>
-            </div>
+                <Button
+                  variant="outline"
+                  className="w-full text-sm"
+                  onClick={downloadImage}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Result
+                </Button>
+                <Button className="w-full text-sm">
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  Request Pickup
+                </Button>
+              </motion.div>
+            )}
+
+            {/* Info Card */}
+            {!result && (
+              <Card className="hidden lg:block">
+                <CardHeader>
+                  <CardTitle className="text-base">How It Works</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[
+                      { num: 1, title: 'Upload', desc: 'Select a waste image' },
+                      { num: 2, title: 'Analyze', desc: 'AI detects items' },
+                      { num: 3, title: 'Results', desc: 'View classification' },
+                    ].map((step) => (
+                      <div key={step.num} className="flex gap-2">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">
+                          {step.num}
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium">{step.title}</p>
+                          <p className="text-xs text-muted-foreground">{step.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        )}
+
+          {/* Right Column - Image & Results */}
+          {imageUrl && (
+            <div className="lg:col-span-2 space-y-4">
+              {/* Image Display with Bounding Boxes */}
+              <motion.div {...animations.slideUp}>
+                <Card className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="flex justify-center bg-black/5 p-4">
+                      <div className="relative inline-block max-w-full">
+                        {/* Hidden reference image */}
+                        <img
+                          ref={imageRef}
+                          src={imageUrl}
+                          alt="Waste"
+                          className="hidden"
+                        />
+                        
+                        {/* Canvas for bounding boxes */}
+                        {result ? (
+                          <canvas
+                            ref={canvasRef}
+                            className="max-w-full h-auto border border-gray-200 rounded"
+                            style={{
+                              maxHeight: '600px',
+                              width: 'auto',
+                              height: 'auto',
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src={imageUrl}
+                            alt="Waste"
+                            className="max-w-full h-auto border border-gray-200 rounded"
+                            style={{
+                              maxHeight: '600px',
+                              width: 'auto',
+                              height: 'auto',
+                            }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Classification Results */}
+              {result && (
+                <motion.div {...animations.slideUp}>
+                  <ClassificationResult result={result} />
+                </motion.div>
+              )}
+            </div>
+          )}
+        </div>
       </motion.div>
     </div>
   );

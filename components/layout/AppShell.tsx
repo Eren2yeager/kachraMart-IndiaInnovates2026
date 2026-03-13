@@ -121,7 +121,7 @@ export function AppShell({ children }: AppShellProps) {
     <SidebarProvider>
       <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
-          <div className="flex items-center gap-2 ">
+           <Link href="/"className="flex items-center gap-2 ">
             <div className="h-8 min-w-8 rounded-full bg-background flex items-center justify-center overflow-hidden border border-border">
               <img
                 src="/favicon.svg"
@@ -137,7 +137,7 @@ export function AppShell({ children }: AppShellProps) {
                 {roleConfig.label} workspace
               </span>
             </div>
-          </div>
+          </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -186,6 +186,7 @@ export function AppShell({ children }: AppShellProps) {
                 className="text-[10px] truncate"
                 style={{ color: roleConfig.color }}
               >
+                
                 {roleConfig.label}
               </span>
             </div>
@@ -193,7 +194,10 @@ export function AppShell({ children }: AppShellProps) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 relative">
+        <div className="w-full h-full ">
+
+    
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 relative ">
           <header className="border-b bg-background/80 backdrop-blur flex items-center justify-between px-4 py-3 md:px-6 sticky top-0">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
@@ -219,9 +223,9 @@ export function AppShell({ children }: AppShellProps) {
                 />
                 {roleConfig.label}
               </span>
-              <Button asChild size="sm" variant="outline">
+              {/* <Button asChild size="sm" variant="outline">
                 <Link href="/">Back to home</Link>
-              </Button>
+              </Button> */}
             </div>
           </header>
           <main className="flex-1 px-4 py-4 md:px-8 md:py-8">
@@ -232,6 +236,7 @@ export function AppShell({ children }: AppShellProps) {
             <span>Phases 1–2 live · Phases 3–6 coming soon.</span>
           </footer> */}
         </div>
+            </div>
       </SidebarInset>
     </SidebarProvider>
   );

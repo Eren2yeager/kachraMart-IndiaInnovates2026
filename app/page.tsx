@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession ,signOut  } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -52,9 +52,10 @@ export default function HomePage() {
         {/* Hero Section */}
         <div className="grid gap-10 md:grid-cols-2 items-center mb-16">
           <div className="space-y-6">
-            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-sm">
+            <Badge variant={"secondary"} className="bg-emerald-100 text-emerald-800 border-emerald-200 text-sm">
               Phase 1–2 live · AI classification ready
             </Badge>
+            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               <span className="block bg-gradient-to-r from-green-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent">
                 {APP_NAME}
@@ -84,8 +85,8 @@ export default function HomePage() {
                       </div>
                     </Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="/api/auth/signout">Sign out</Link>
+                  <Button  size="lg" variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>
+                    Sign out
                   </Button>
                 </>
               ) : (

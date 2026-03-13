@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, ArrowRight, RotateCcw, Download } from 'lucide-react';
+import { Sparkles, ArrowRight, Download } from 'lucide-react';
 import { ImageUpload } from '@/components/citizen/ImageUpload';
+import { CameraCapture } from '@/components/citizen/CameraCapture';
 import { ClassificationResult } from '@/components/citizen/ClassificationResult';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,7 @@ export default function ClassifyPage() {
   const [classifying, setClassifying] = useState(false);
   const [result, setResult] = useState<ClassificationData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uploadTab, setUploadTab] = useState<'upload' | 'camera'>('upload');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -151,12 +153,48 @@ export default function ClassifyPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Upload & Controls */}
           <div className={`space-y-4 ${imageUrl ? 'lg:col-span-1' : 'lg:col-span-3'}`}>
-            {/* Upload Section */}
-            <ImageUpload 
-              onImageUploaded={handleImageUploaded} 
-              onImageRemoved={handleReset}
-              isLoading={classifying}
-            />
+            {/* Upload & Camera Tabs */}
+            <div className="space-y-4">
+              <div className="flex gap-1 border-b border-muted-foreground/20">
+                <button
+                  onClick={() => setUploadTab('upload')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    uploadTab === 'upload'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Upload Image
+                </button>
+                <button
+                  onClick={() => setUploadTab('camera')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    uploadTab === 'camera'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Take Photo
+                </button>
+              </div>
+
+              {/* Upload Section */}
+              {uploadTab === 'upload' && (
+                <ImageUpload 
+                  onImageUploaded={handleImageUploaded} 
+                  onImageRemoved={handleReset}
+                  isLoading={classifying}
+                />
+              )}
+
+              {/* Camera Section */}
+              {uploadTab === 'camera' && (
+                <CameraCapture 
+                  onImageUploaded={handleImageUploaded}
+                  isLoading={classifying}
+                />
+              )}
+            </div>
 
             {/* Classify Button */}
             {imageUrl && !classifying && !result && (
@@ -226,7 +264,7 @@ export default function ClassifyPage() {
 
             {/* Info Card */}
             {!result && (
-              <Card className="hidden lg:block">
+              <Card className="">
                 <CardHeader>
                   <CardTitle className="text-base">How It Works</CardTitle>
                 </CardHeader>

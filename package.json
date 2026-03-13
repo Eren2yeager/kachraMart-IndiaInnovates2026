@@ -31,6 +31,7 @@
     "react-dom": "19.2.3",
     "react-leaflet": "^5.0.0",
     "react-resizable-panels": "^4.7.1",
+    "react-webcam": "^7.2.0",
     "recharts": "^3.6.0",
     "shadcn": "^4.0.5",
     "tailwind-merge": "^3.5.0",

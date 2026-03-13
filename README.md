@@ -1,4 +1,4 @@
-# 🌍 KachraMart - Circular Waste Management Platform
+# ♻️ KachraMart - Circular Waste Management Platform
 
 > **Transform city waste into a transparent, trackable resource stream**
 

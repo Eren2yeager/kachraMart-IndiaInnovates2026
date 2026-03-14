@@ -1,67 +1,11 @@
-<style>
-  .kachramart-notice {
-    background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
-    border-left: 5px solid #ffa500;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-  
-  .kachramart-notice-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-  
-  .kachramart-notice-icon {
-    font-size: 20px;
-    flex-shrink: 0;
-  }
-  
-  .kachramart-notice-title {
-    color: #fff;
-    font-weight: 700;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
-  }
-  
-  .kachramart-notice-content {
-    color: #ffffff;
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 0;
-  }
-  
-  .kachramart-notice-link {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-  
-  .kachramart-notice-link:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    text-decoration: underline;
-  }
-</style>
-
-<div class="kachramart-notice">
-  <div class="kachramart-notice-header">
-    <span class="kachramart-notice-icon">📍</span>
-    <h3 class="kachramart-notice-title">Important Notice</h3>
+<div style="background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%); border-left: 5px solid #ffa500; padding: 16px 20px; margin-bottom: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+    <span style="font-size: 20px; flex-shrink: 0;">📍</span>
+    <h3 style="color: #fff; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Important Notice</h3>
   </div>
-  <p class="kachramart-notice-content">
+  <p style="color: #ffffff; font-size: 14px; line-height: 1.6; margin: 0;">
     ⚠️ The previous deployment URL is no longer available. Please use the new URL instead:<br>
-    <strong>🔗 <a href="https://kachra-mart-india-innovates2026.vercel.app/" class="kachramart-notice-link">https://kachra-mart-india-innovates2026.vercel.app/</a></strong>
+    <strong>🔗 <a href="https://kachra-mart-india-innovates2026.vercel.app/" style="color: #fff; text-decoration: none; font-weight: 600; display: inline-block; padding: 4px 8px; border-radius: 4px; background-color: rgba(255, 255, 255, 0.2); transition: all 0.3s ease;">https://kachra-mart-india-innovates2026.vercel.app/</a></strong>
   </p>
 </div>
 

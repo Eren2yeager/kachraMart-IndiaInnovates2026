@@ -136,7 +136,7 @@ export default function ClassifyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen  p-4 md:p-6 lg:p-8">
       <motion.div {...animations.fadeIn} className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -155,13 +155,13 @@ export default function ClassifyPage() {
           <div className={`space-y-4 ${imageUrl ? 'lg:col-span-1' : 'lg:col-span-3'}`}>
             {/* Upload & Camera Tabs */}
             <div className="space-y-4">
-              <div className="flex gap-1 border-b border-muted-foreground/20">
+              <div className="flex gap-1 border-b border-muted-foreground/20 dark:border-muted-foreground/30">
                 <button
                   onClick={() => setUploadTab('upload')}
                   className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                     uploadTab === 'upload'
                       ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                      : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-foreground'
                   }`}
                 >
                   Upload Image
@@ -171,7 +171,7 @@ export default function ClassifyPage() {
                   className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                     uploadTab === 'camera'
                       ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                      : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-foreground'
                   }`}
                 >
                   Take Photo
@@ -237,7 +237,7 @@ export default function ClassifyPage() {
             {error && (
               <motion.div
                 {...animations.slideDown}
-                className="p-3 text-xs md:text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg"
+                className="p-3 text-xs md:text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg"
               >
                 {error}
               </motion.div>
@@ -298,7 +298,7 @@ export default function ClassifyPage() {
               <motion.div {...animations.slideUp}>
                 <Card className="overflow-hidden">
                   <CardContent className="p-0">
-                    <div className="flex justify-center bg-black/5 p-4">
+                    <div className="flex justify-center bg-black/5 dark:bg-black/40 p-4">
                       <div className="relative inline-block max-w-full">
                         {/* Hidden reference image */}
                         <img
@@ -312,7 +312,7 @@ export default function ClassifyPage() {
                         {result ? (
                           <canvas
                             ref={canvasRef}
-                            className="max-w-full h-auto border border-gray-200 rounded"
+                            className="max-w-full h-auto border border-gray-200 dark:border-gray-700 rounded"
                             style={{
                               maxHeight: '600px',
                               width: 'auto',
@@ -323,7 +323,7 @@ export default function ClassifyPage() {
                           <img
                             src={imageUrl}
                             alt="Waste"
-                            className="max-w-full h-auto border border-gray-200 rounded"
+                            className="max-w-full h-auto border border-gray-200 dark:border-gray-700 rounded"
                             style={{
                               maxHeight: '600px',
                               width: 'auto',

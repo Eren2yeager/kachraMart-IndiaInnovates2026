@@ -1,11 +1,9 @@
-'use client';
+"use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/auth/SessionProvider";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { Loader2 } from "lucide-react";
+import { ThemeProvider } from "next-themes";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,13 +21,11 @@ function RootLayoutContent({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-
-
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {children}
       </body>
     </html>
@@ -42,8 +38,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SessionProvider>
-      <RootLayoutContent>{children}</RootLayoutContent>
-    </SessionProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <SessionProvider>
+        <RootLayoutContent>{children}</RootLayoutContent>
+      </SessionProvider>
+    </ThemeProvider>
   );
 }

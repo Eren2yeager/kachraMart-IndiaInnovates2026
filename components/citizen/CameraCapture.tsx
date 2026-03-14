@@ -128,7 +128,7 @@ export function CameraCapture({ onImageUploaded, isLoading }: CameraCaptureProps
           {error && (
             <motion.div
               {...animations.slideDown}
-              className="p-3 text-xs md:text-sm text-red-600 bg-red-50 border border-red-200 rounded-md"
+              className="p-3 text-xs md:text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md"
             >
               {error}
             </motion.div>
@@ -137,7 +137,7 @@ export function CameraCapture({ onImageUploaded, isLoading }: CameraCaptureProps
           {permissionDenied && (
             <motion.div
               {...animations.slideDown}
-              className="p-3 text-xs md:text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md space-y-2"
+              className="p-3 text-xs md:text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-md space-y-2"
             >
               <p className="font-medium">Camera Permission Required</p>
               <p className="text-xs">
@@ -225,7 +225,7 @@ export function CameraCapture({ onImageUploaded, isLoading }: CameraCaptureProps
       {error && (
         <motion.div
           {...animations.slideDown}
-          className="p-3 text-xs md:text-sm text-red-600 bg-red-50 border border-red-200 rounded-md"
+          className="p-3 text-xs md:text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md"
         >
           {error}
         </motion.div>

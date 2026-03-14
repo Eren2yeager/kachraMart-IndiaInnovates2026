@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/shared/UserAvatar";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { APP_NAME, USER_ROLES } from "@/config/constants";
 import {
@@ -156,7 +157,7 @@ export function AppShell({ children }: AppShellProps) {
                           <span className="flex-1 flex items-center justify-between gap-2">
                             <span>{item.label}</span>
                             {item.comingSoon && (
-                              <span className="text-[10px] rounded-full px-2 py-0.5 bg-amber-100 text-amber-700 border border-amber-200">
+                              <span className="text-[10px] rounded-full px-2 py-0.5 bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
                                 Coming soon
                               </span>
                             )}
@@ -171,24 +172,29 @@ export function AppShell({ children }: AppShellProps) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <div className="flex items-center gap-2 px-2 py-1">
-            <UserAvatar
-              name={user.name || "User"}
-              image={user.image || undefined}
-              role={user.role}
-              size="sm"
-            />
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-medium truncate">
-                {user.name || "User"}
-              </span>
-              <span
-                className="text-[10px] truncate"
-                style={{ color: roleConfig.color }}
-              >
-                
-                {roleConfig.label}
-              </span>
+          <div className="space-y-3">
+            {/* <div className="flex items-center justify-center">
+              <ThemeToggle />
+            </div> */}
+            <div className="flex items-center gap-2 px-2 py-1">
+              <UserAvatar
+                name={user.name || "User"}
+                image={user.image || undefined}
+                role={user.role}
+                size="sm"
+              />
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-medium truncate">
+                  {user.name || "User"}
+                </span>
+                <span
+                  className="text-[10px] truncate"
+                  style={{ color: roleConfig.color }}
+                >
+                  
+                  {roleConfig.label}
+                </span>
+              </div>
             </div>
           </div>
         </SidebarFooter>
@@ -197,8 +203,8 @@ export function AppShell({ children }: AppShellProps) {
         <div className="w-full h-full ">
 
     
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 relative ">
-          <header className="border-b bg-background/80 backdrop-blur flex items-center justify-between px-4 py-3 md:px-6 sticky top-0">
+        <div className="min-h-screen border rounded flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative ">
+          <header className="border-b bg-background/80 dark:bg-card/80 backdrop-blur flex items-center justify-between p-3 md:px-5 sticky top-0">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
               <div className="flex flex-col">
@@ -210,11 +216,11 @@ export function AppShell({ children }: AppShellProps) {
                 </span>
               </div>
             </div>
-            <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <span
                 className={cn(
-                  "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border",
-                  "bg-white/50 backdrop-blur"
+                  "hidden md:inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border",
+                  "bg-white/50 dark:bg-slate-800/50 backdrop-blur"
                 )}
               >
                 <span
@@ -223,9 +229,8 @@ export function AppShell({ children }: AppShellProps) {
                 />
                 {roleConfig.label}
               </span>
-              {/* <Button asChild size="sm" variant="outline">
-                <Link href="/">Back to home</Link>
-              </Button> */}
+
+             <ThemeToggle />
             </div>
           </header>
           <main className="flex-1 px-4 py-4 md:px-8 md:py-8">

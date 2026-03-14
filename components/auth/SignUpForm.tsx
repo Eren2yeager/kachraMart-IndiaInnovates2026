@@ -229,7 +229,7 @@ export function SignUpForm() {
             {error && (
               <motion.div
                 {...animations.slideDown}
-                className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md"
+                className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md"
               >
                 {error}
               </motion.div>
@@ -315,12 +315,12 @@ export function SignUpForm() {
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-full object-cover rounded-lg border-2 border-green-200"
+                      className="w-full h-full object-cover rounded-lg border-2 border-green-200 dark:border-green-800"
                     />
                     <button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition"
+                      className="absolute -top-2 -right-2 bg-red-500 dark:bg-red-600 text-white rounded-full p-1 hover:bg-red-600 dark:hover:bg-red-700 transition"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -334,8 +334,8 @@ export function SignUpForm() {
                     onClick={() => fileInputRef.current?.click()}
                     className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition ${
                       isDragActive
-                        ? 'border-green-500 bg-green-100'
-                        : 'border-green-300 hover:border-green-500 hover:bg-green-50'
+                        ? 'border-green-500 bg-green-100 dark:bg-green-950'
+                        : 'border-green-300 dark:border-green-700 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-950'
                     }`}
                   >
                     <Upload className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -406,10 +406,10 @@ export function SignUpForm() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background dark:bg-card px-2 text-muted-foreground">Or continue with</span>
               </div>
             </div>
 

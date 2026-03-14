@@ -79,7 +79,7 @@ export function SignInForm() {
             {error && (
               <motion.div
                 {...animations.slideDown}
-                className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md"
+                className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md"
               >
                 {error}
               </motion.div>
@@ -132,10 +132,10 @@ export function SignInForm() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background dark:bg-card px-2 text-muted-foreground">Or continue with</span>
               </div>
             </div>
 

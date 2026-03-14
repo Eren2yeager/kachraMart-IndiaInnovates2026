@@ -203,7 +203,7 @@ export function AppShell({ children }: AppShellProps) {
         <div className="w-full h-full ">
 
     
-        <div className="min-h-screen border rounded flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative ">
+        <div className="min-h-screen border rounded flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 relative ">
           <header className="border-b bg-background/80 dark:bg-card/80 backdrop-blur flex items-center justify-between p-3 md:px-5 sticky top-0">
             <div className="flex items-center gap-2">
               <SidebarTrigger />

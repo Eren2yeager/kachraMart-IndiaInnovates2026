@@ -1,27 +1,19 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { SignInForm } from "@/components/auth/SignInForm";
 import LightRays from "@/components/ui/LightRays";
 import { APP_NAME } from "@/config/constants";
+import { generatePageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = generatePageMetadata(
+  "Sign In",
+  "Sign in to your KachraMart account to manage waste classification, pickups, and sustainability impact.",
+  "/auth/signin"
+);
 
 export default function SignInPage() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4">
-      <div className="pointer-events-none absolute inset-0 opacity-60 dark:opacity-40">
-        <LightRays
-          className="w-full h-full"
-          raysOrigin="top-center"
-          raysColor="#22c55e"
-          raysSpeed={0.5}
-          lightSpread={1.1}
-          rayLength={1.6}
-          fadeDistance={1.2}
-          saturation={1.05}
-          followMouse={false}
-          mouseInfluence={0}
-          noiseAmount={0.03}
-          distortion={0.08}
-        />
-      </div>
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent">
 
 
       <div className="relative z-10 w-full max-w-md space-y-4">

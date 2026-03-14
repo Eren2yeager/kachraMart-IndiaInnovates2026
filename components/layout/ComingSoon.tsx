@@ -34,7 +34,7 @@ export function ComingSoon({
         </div>
       </div>
 
-      <Card className="border-dashed border-primary/20 dark:border-primary/30 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
+      <Card className="border-dashed border-primary/20 dark:border-primary/30 bg-white/60 dark:bg-zinc-900/60 backdrop-blur">
         <CardHeader className="flex flex-col  items-start justify-center gap-4">
           <div>
             <CardTitle className="text-base md:text-lg">In Development</CardTitle>

@@ -88,4 +88,27 @@ export const ORDER_STATUS_LABELS = {
 // App metadata
 export const APP_NAME = 'KachraMart';
 export const APP_DESCRIPTION = 'AI-Powered Circular Waste Management Platform';
-export const APP_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+export const APP_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+export const APP_KEYWORDS = 'waste management, circular economy, AI waste classification, recycling, India, sustainable, environmental';
+export const APP_AUTHOR = 'KachraMart Team';
+export const APP_LOCALE = 'en_IN';
+
+// SEO Configuration
+export const SEO_CONFIG = {
+  title: APP_NAME,
+  description: APP_DESCRIPTION,
+  keywords: APP_KEYWORDS,
+  author: APP_AUTHOR,
+  locale: APP_LOCALE,
+  type: 'website',
+  image: `${APP_URL}/og-image.png`,
+  twitterHandle: '@kachramart',
+};
+
+// Social Links
+export const SOCIAL_LINKS = {
+  twitter: 'https://twitter.com/kachramart',
+  linkedin: 'https://linkedin.com/company/kachramart',
+  instagram: 'https://instagram.com/kachramart',
+  facebook: 'https://facebook.com/kachramart',
+};

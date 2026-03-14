@@ -1,0 +1,45 @@
+# KachraMart - Robots.txt
+# Allow search engines to crawl public pages
+
+User-agent: *
+Allow: /
+Allow: /auth/signin
+Allow: /auth/signup
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /citizen/
+Disallow: /collector/
+Disallow: /dealer/
+Disallow: /admin/
+Disallow: /.next/
+Disallow: /node_modules/
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+Allow: /auth/signin
+Allow: /auth/signup
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /citizen/
+Disallow: /collector/
+Disallow: /dealer/
+Disallow: /admin/
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+Allow: /auth/signin
+Allow: /auth/signup
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /citizen/
+Disallow: /collector/
+Disallow: /dealer/
+Disallow: /admin/
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://kachramart-indiainnovates2026.onrender.com/sitemap.xml

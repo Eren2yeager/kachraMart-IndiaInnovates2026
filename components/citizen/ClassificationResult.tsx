@@ -116,7 +116,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
                     key={index}
                     {...animations.slideLeft}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50 dark:bg-muted/30"
                   >
                     <div className="flex items-center gap-3">
                       <div
@@ -151,7 +151,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
         <CardContent className="space-y-3">
           {result.wasteType === 'biodegradable' && (
             <div className="text-sm space-y-2">
-              <p className="font-medium text-green-600">♻️ Biodegradable Waste</p>
+              <p className="font-medium text-green-600 dark:text-green-400">♻️ Biodegradable Waste</p>
               <p className="text-muted-foreground">
                 This waste can decompose naturally. It's perfect for composting and will break down
                 into organic matter.
@@ -160,7 +160,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
           )}
           {result.wasteType === 'recyclable' && (
             <div className="text-sm space-y-2">
-              <p className="font-medium text-blue-600">♻️ Recyclable Waste</p>
+              <p className="font-medium text-blue-600 dark:text-blue-400">♻️ Recyclable Waste</p>
               <p className="text-muted-foreground">
                 This material can be processed and reused. Recycling helps conserve resources and
                 reduce landfill waste.
@@ -169,7 +169,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
           )}
           {result.wasteType === 'hazardous' && (
             <div className="text-sm space-y-2">
-              <p className="font-medium text-red-600">⚠️ Hazardous Waste</p>
+              <p className="font-medium text-red-600 dark:text-red-400">⚠️ Hazardous Waste</p>
               <p className="text-muted-foreground">
                 This waste requires special handling and disposal. Never dispose of it with regular
                 trash.
@@ -178,7 +178,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
           )}
           {result.wasteType === 'ewaste' && (
             <div className="text-sm space-y-2">
-              <p className="font-medium text-amber-600">⚡ E-Waste</p>
+              <p className="font-medium text-amber-600 dark:text-amber-400">⚡ E-Waste</p>
               <p className="text-muted-foreground">
                 Electronic waste contains valuable materials that can be recovered. Proper disposal
                 prevents environmental contamination.
@@ -187,7 +187,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
           )}
           {result.wasteType === 'construction' && (
             <div className="text-sm space-y-2">
-              <p className="font-medium text-purple-600">🏗️ Construction Waste</p>
+              <p className="font-medium text-purple-600 dark:text-purple-400">🏗️ Construction Waste</p>
               <p className="text-muted-foreground">
                 Construction materials can often be reused or recycled for new building projects.
               </p>

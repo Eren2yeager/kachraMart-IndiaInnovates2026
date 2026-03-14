@@ -34,7 +34,7 @@ export function ComingSoon({
         </div>
       </div>
 
-      <Card className="border-dashed border-primary/20 bg-white/60 backdrop-blur">
+      <Card className="border-dashed border-primary/20 dark:border-primary/30 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <CardHeader className="flex flex-col  items-start justify-center gap-4">
           <div>
             <CardTitle className="text-base md:text-lg">In Development</CardTitle>
@@ -44,7 +44,7 @@ export function ComingSoon({
           </div>
           <Badge
             variant="outline"
-            className="text-[10px] md:text-xs border-amber-300 bg-amber-50 text-amber-700"
+            className="text-[10px] md:text-xs border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-200"
           >
             {phaseLabel} · Coming soon
           </Badge>
@@ -73,7 +73,7 @@ export function ComingSoon({
             </div>
           )}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t dark:border-slate-700">
             <p className="text-xs text-muted-foreground max-w-xs">
               You can already explore Phase 1–2 features like authentication and
               AI classification while we build the rest.

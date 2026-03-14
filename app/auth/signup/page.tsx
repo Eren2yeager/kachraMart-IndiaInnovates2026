@@ -5,8 +5,8 @@ import { APP_NAME } from "@/config/constants";
 
 export default function SignUpPage() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-4">
-      <div className="pointer-events-none absolute inset-0 opacity-60">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4">
+      <div className="pointer-events-none absolute inset-0 opacity-60 dark:opacity-40">
         <LightRays
           className="w-full h-full"
           raysOrigin="top-center"
@@ -26,7 +26,7 @@ export default function SignUpPage() {
 
       <div className="relative z-10 w-full max-w-md space-y-4">
         <div className="text-center mb-2">
-          <p className="text-xs uppercase tracking-wide text-emerald-700 font-semibold">
+          <p className="text-xs uppercase tracking-wide text-emerald-700 dark:text-emerald-400 font-semibold">
             {APP_NAME}
           </p>
           <p className="text-xs text-muted-foreground">

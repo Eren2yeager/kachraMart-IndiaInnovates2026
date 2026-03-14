@@ -167,8 +167,8 @@ export function ImageUpload({ onImageUploaded, onImageRemoved, isLoading }: Imag
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed transition-colors cursor-pointer ${
               isDragActive
-                ? 'border-primary/80 bg-primary/5'
-                : 'border-muted-foreground/25 hover:border-primary/50'
+                ? 'border-primary/80 bg-primary/5 dark:bg-primary/10'
+                : 'border-muted-foreground/25 hover:border-primary/50 dark:border-muted-foreground/40'
             }`}
           >
             <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center">
@@ -187,17 +187,17 @@ export function ImageUpload({ onImageUploaded, onImageRemoved, isLoading }: Imag
         </motion.div>
       ) : (
         <motion.div {...animations.fadeIn}>
-          <Card className="border-2 border-green-200 bg-green-50">
+          <Card className="border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950">
             <div className="p-6 md:p-8 space-y-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-full bg-green-100 p-2 flex-shrink-0">
-                  <svg className="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <div className="rounded-full bg-green-100 dark:bg-green-900 p-2 flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-semibold text-green-900">Image Uploaded</p>
-                  <p className="text-xs text-green-700 mt-1">Ready for classification</p>
+                  <p className="text-sm font-semibold text-green-900 dark:text-green-100">Image Uploaded</p>
+                  <p className="text-xs text-green-700 dark:text-green-300 mt-1">Ready for classification</p>
                 </div>
               </div>
 
@@ -231,7 +231,7 @@ export function ImageUpload({ onImageUploaded, onImageRemoved, isLoading }: Imag
       {error && (
         <motion.div
           {...animations.slideDown}
-          className="p-3 text-xs md:text-sm text-red-600 bg-red-50 border border-red-200 rounded-md"
+          className="p-3 text-xs md:text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md"
         >
           {error}
         </motion.div>

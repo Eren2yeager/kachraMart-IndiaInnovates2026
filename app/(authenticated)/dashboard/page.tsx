@@ -192,7 +192,7 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 <Badge
                   variant="outline"
-                  className="text-[10px] md:text-xs border-amber-300 bg-amber-50 text-amber-700"
+                  className="text-[10px] md:text-xs border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-200"
                 >
                  You will need to signin again for changes to take effect.
                 </Badge>
@@ -212,12 +212,12 @@ export default function DashboardPage() {
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        className="block w-full text-sm text-gray-500
+                        className="block w-full text-sm text-gray-500 dark:text-gray-400
                           file:mr-4 file:py-2 file:px-4
                           file:rounded-md file:border-0
                           file:text-sm file:font-semibold
-                          file:bg-blue-50 file:text-blue-700
-                          hover:file:bg-blue-100"
+                          file:bg-blue-50 dark:file:bg-blue-950 file:text-blue-700 dark:file:text-blue-200
+                          hover:file:bg-blue-100 dark:hover:file:bg-blue-900"
                       />
                       <p className="text-xs text-muted-foreground mt-1">
                         PNG, JPG up to 5MB
@@ -252,7 +252,7 @@ export default function DashboardPage() {
                 </div>
 
                 {error && (
-                  <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                  <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md">
                     {error}
                   </div>
                 )}
@@ -362,10 +362,10 @@ export default function DashboardPage() {
         >
           {user.role === "citizen" && (
             <>
-              <Card className="bg-emerald-50/60 border-emerald-100">
+              <Card className="bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-800">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-emerald-600" />
+                    <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     AI classifications
                   </CardTitle>
                   <CardDescription className="text-xs">
@@ -373,7 +373,7 @@ export default function DashboardPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <p className="text-xs text-emerald-900/80">
+                  <p className="text-xs text-emerald-900/80 dark:text-emerald-200/80">
                     Upload an image and get a breakdown of detected items and
                     waste category.
                   </p>
@@ -386,39 +386,39 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-sky-50/60 border-sky-100">
+              <Card className="bg-sky-50/60 dark:bg-sky-950/30 border-sky-100 dark:border-sky-800">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-sky-600" />
+                    <Truck className="h-4 w-4 text-sky-600 dark:text-sky-400" />
                     Pickup requests
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 3
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-sky-900/80">
+                <CardContent className="space-y-2 text-xs text-sky-900/80 dark:text-sky-200/80">
                   <p>
                     Create pickup requests from AI results and track status
                     end-to-end.
                   </p>
-                  <p className="font-medium text-sky-700">
+                  <p className="font-medium text-sky-700 dark:text-sky-300">
                     Visible now as a &quot;Coming soon&quot; page in the app
                     shell.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-amber-50/60 border-amber-100">
+              <Card className="bg-amber-50/60 dark:bg-amber-950/30 border-amber-100 dark:border-amber-800">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Leaf className="h-4 w-4 text-amber-600" />
+                    <Leaf className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     Rewards & impact
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 3–4
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-amber-900/80">
+                <CardContent className="space-y-2 text-xs text-amber-900/80 dark:text-amber-200/80">
                   <p>
                     You&apos;ll soon see reward points and CO₂ savings driven by
                     your pickups.
@@ -430,17 +430,17 @@ export default function DashboardPage() {
 
           {user.role === "collector" && (
             <>
-              <Card className="bg-sky-50/60 border-sky-100">
+              <Card className="bg-sky-50/60 dark:bg-sky-950/30 border-sky-100 dark:border-sky-800">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-sky-600" />
+                    <Truck className="h-4 w-4 text-sky-600 dark:text-sky-400" />
                     Assigned pickups
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 3
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-sky-900/80">
+                <CardContent className="space-y-2 text-xs text-sky-900/80 dark:text-sky-200/80">
                   <p>
                     A dedicated dashboard for your upcoming, in-progress, and
                     completed tasks.
@@ -448,17 +448,17 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-emerald-50/60 border-emerald-100">
+              <Card className="bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-800">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-emerald-600" />
+                    <BarChart3 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     Route optimization
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 3–4
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-emerald-900/80">
+                <CardContent className="space-y-2 text-xs text-emerald-900/80 dark:text-emerald-200/80">
                   <p>
                     Map-backed routes that minimize distance and maximize
                     recovery.
@@ -470,17 +470,17 @@ export default function DashboardPage() {
 
           {user.role === "dealer" && (
             <>
-              <Card className="bg-violet-50/60 border-violet-100">
+              <Card className="bg-violet-50/60 dark:bg-violet-950/30 border-violet-100 dark:border-violet-800">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Recycle className="h-4 w-4 text-violet-600" />
+                    <Recycle className="h-4 w-4 text-violet-600 dark:text-violet-400" />
                     Marketplace
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 5
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-violet-900/80">
+                <CardContent className="space-y-2 text-xs text-violet-900/80 dark:text-violet-200/80">
                   <p>
                     Browse, filter, and buy verified waste inventory from city
                     hubs.
@@ -488,17 +488,17 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-50/60 border-slate-200">
+              <Card className="bg-slate-50/60 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-slate-700" />
+                    <BarChart3 className="h-4 w-4 text-slate-700 dark:text-slate-300" />
                     Order management
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 5
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-slate-800/80">
+                <CardContent className="space-y-2 text-xs text-slate-800/80 dark:text-slate-200/80">
                   <p>
                     See active, completed, and historical orders with pricing
                     and invoices.
@@ -510,17 +510,17 @@ export default function DashboardPage() {
 
           {user.role === "admin" && (
             <>
-              <Card className="bg-slate-50/60 border-slate-200">
+              <Card className="bg-slate-50/60 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-slate-800" />
+                    <BarChart3 className="h-4 w-4 text-slate-800 dark:text-slate-300" />
                     Waste flow analytics
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 6
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-slate-800/80">
+                <CardContent className="space-y-2 text-xs text-slate-800/80 dark:text-slate-200/80">
                   <p>
                     Track how much waste is collected, stored, and sold across
                     types and hubs.
@@ -528,17 +528,17 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-emerald-50/60 border-emerald-100">
+              <Card className="bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-800">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-emerald-600" />
+                    <Truck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     Hubs & inventory
                   </CardTitle>
                   <CardDescription className="text-xs">
                     Roadmap: Phase 4
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2 text-xs text-emerald-900/80">
+                <CardContent className="space-y-2 text-xs text-emerald-900/80 dark:text-emerald-200/80">
                   <p>
                     See hub capacities, current load, and how inventory links to
                     dealer orders.

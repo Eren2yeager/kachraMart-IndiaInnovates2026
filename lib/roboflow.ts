@@ -1,7 +1,7 @@
 import { WasteType } from '@/types';
 
 // Waste category mapping from detected items to waste types
-const wasteCategoryMap = {
+const wasteCategoryMap: Record<string, WasteType> = {
   "plastic-bottle": "recyclable",
   "plastic-bag": "recyclable",
   "metal-can": "recyclable",

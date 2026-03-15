@@ -10,9 +10,9 @@ const wasteCategoryMap: Record<string, WasteType> = {
   'paper': 'recyclable',
 
   // BIODEGRADABLE
-  'food-waste': 'biodegradable',
-  'fruit-peel': 'biodegradable',
-  'vegetable-waste': 'biodegradable',
+  'food': 'biodegradable',
+  'fruit': 'biodegradable',
+  'vegetable': 'biodegradable',
   'egg-shell': 'biodegradable',
   'garden-leaves': 'biodegradable',
 
@@ -32,7 +32,6 @@ const wasteCategoryMap: Record<string, WasteType> = {
 
   // CONSTRUCTION
   'brick': 'construction',
-  'concrete': 'construction',
   'cement-bag': 'construction',
   'tiles': 'construction',
   'construction-debris': 'construction',

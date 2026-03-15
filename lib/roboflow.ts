@@ -1,41 +1,31 @@
 import { WasteType } from '@/types';
 
 // Waste category mapping from detected items to waste types
-const wasteCategoryMap: Record<string, WasteType> = {
-  // RECYCLABLE
-  'plastic-bottle': 'recyclable',
-  'plastic-bag': 'recyclable',
-  'metal-can': 'recyclable',
-  'cardboard': 'recyclable',
-  'paper': 'recyclable',
+const wasteCategoryMap = {
+  "plastic-bottle": "recyclable",
+  "plastic-bag": "recyclable",
+  "metal-can": "recyclable",
+  "cardboard": "recyclable",
+  "paper": "recyclable",
 
-  // BIODEGRADABLE
-  'food': 'biodegradable',
-  'fruit': 'biodegradable',
+  "food": "biodegradable",
+  "fruit": "biodegradable",
   'vegetable': 'biodegradable',
-  'egg-shell': 'biodegradable',
-  'garden-leaves': 'biodegradable',
+  
+  "battery": "hazardous",
 
-  // HAZARDOUS
-  'battery': 'hazardous',
-  'chemical-container': 'hazardous',
-  'paint-can': 'hazardous',
-  'medical-waste': 'hazardous',
-  'pesticide-container': 'hazardous',
-
-  // E-WASTE
   'mobile-phone': 'ewaste',
   'circuit-board': 'ewaste',
   'charger': 'ewaste',
   'laptop': 'ewaste',
   'keyboard': 'ewaste',
 
-  // CONSTRUCTION
-  'brick': 'construction',
-  'cement-bag': 'construction',
-  'tiles': 'construction',
-  'construction-debris': 'construction',
-};
+  "brick": "construction",
+  'tiles': 'construction'
+}
+
+const detectedClass = data.predictions[0].class
+const category = wasteCategoryMap[detectedClass]
 
 export interface RoboflowDetection {
   class: string;

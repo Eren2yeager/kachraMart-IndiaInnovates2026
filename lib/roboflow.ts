@@ -24,8 +24,7 @@ const wasteCategoryMap: Record<string, WasteType> = {
   'tiles': 'construction'
 }
 
-const detectedClass = data.predictions[0].class
-const category = wasteCategoryMap[detectedClass]
+
 
 export interface RoboflowDetection {
   class: string;

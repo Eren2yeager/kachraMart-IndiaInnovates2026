@@ -2,18 +2,40 @@ import { WasteType } from '@/types';
 
 // Waste category mapping from detected items to waste types
 const wasteCategoryMap: Record<string, WasteType> = {
+  // RECYCLABLE
   'plastic-bottle': 'recyclable',
   'plastic-bag': 'recyclable',
   'metal-can': 'recyclable',
   'cardboard': 'recyclable',
   'paper': 'recyclable',
+
+  // BIODEGRADABLE
   'food-waste': 'biodegradable',
   'fruit-peel': 'biodegradable',
+  'vegetable-waste': 'biodegradable',
+  'egg-shell': 'biodegradable',
+  'garden-leaves': 'biodegradable',
+
+  // HAZARDOUS
   'battery': 'hazardous',
+  'chemical-container': 'hazardous',
+  'paint-can': 'hazardous',
+  'medical-waste': 'hazardous',
+  'pesticide-container': 'hazardous',
+
+  // E-WASTE
   'mobile-phone': 'ewaste',
   'circuit-board': 'ewaste',
+  'charger': 'ewaste',
+  'laptop': 'ewaste',
+  'keyboard': 'ewaste',
+
+  // CONSTRUCTION
   'brick': 'construction',
   'concrete': 'construction',
+  'cement-bag': 'construction',
+  'tiles': 'construction',
+  'construction-debris': 'construction',
 };
 
 export interface RoboflowDetection {

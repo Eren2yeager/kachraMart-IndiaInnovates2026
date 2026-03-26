@@ -512,7 +512,7 @@ function HubDetailSheet({
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <RechartsTooltip
-                    formatter={(v: number) => [`${v} kg`, 'Quantity']}
+                    formatter={(v) => [`${v} kg`, 'Quantity']}
                     contentStyle={{ fontSize: 12 }}
                   />
                   <Bar dataKey="quantity" radius={[4, 4, 0, 0]}>

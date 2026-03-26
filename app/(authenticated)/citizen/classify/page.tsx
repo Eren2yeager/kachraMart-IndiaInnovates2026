@@ -6,18 +6,23 @@ import { Sparkles, ArrowRight, Download } from 'lucide-react';
 import { ImageUpload } from '@/components/citizen/ImageUpload';
 import { CameraCapture } from '@/components/citizen/CameraCapture';
 import { ClassificationResult } from '@/components/citizen/ClassificationResult';
+import { RequestPickupSheet } from '@/components/citizen/RequestPickupSheet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { animations } from '@/lib/theme';
 import { ClassificationResult as ClassificationData } from '@/lib/roboflow';
+import { IWasteListing } from '@/types';
+import { useRouter } from 'next/navigation';
 
 export default function ClassifyPage() {
+  const router = useRouter();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
   const [classifying, setClassifying] = useState(false);
   const [result, setResult] = useState<ClassificationData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadTab, setUploadTab] = useState<'upload' | 'camera'>('upload');
+  const [pickupSheetOpen, setPickupSheetOpen] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -55,10 +60,10 @@ export default function ClassifyPage() {
 
       // Draw bounding boxes
       const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899'];
-      
+
       result.allDetections.forEach((detection, index) => {
         const color = colors[index % colors.length];
-        
+
         // Calculate box coordinates
         const x = detection.x - detection.width / 2;
         const y = detection.y - detection.height / 2;
@@ -126,6 +131,10 @@ export default function ClassifyPage() {
     setImageDimensions(null);
   };
 
+  const handlePickupSuccess = (listing: IWasteListing) => {
+    router.push('/citizen/pickups');
+  };
+
   const downloadImage = () => {
     if (canvasRef.current) {
       const link = document.createElement('a');
@@ -158,21 +167,19 @@ export default function ClassifyPage() {
               <div className="flex gap-1 border-b border-muted-foreground/20 dark:border-muted-foreground/30">
                 <button
                   onClick={() => setUploadTab('upload')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    uploadTab === 'upload'
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-foreground'
-                  }`}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${uploadTab === 'upload'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-foreground'
+                    }`}
                 >
                   Upload Image
                 </button>
                 <button
                   onClick={() => setUploadTab('camera')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    uploadTab === 'camera'
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-foreground'
-                  }`}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${uploadTab === 'camera'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-foreground'
+                    }`}
                 >
                   Take Photo
                 </button>
@@ -180,8 +187,8 @@ export default function ClassifyPage() {
 
               {/* Upload Section */}
               {uploadTab === 'upload' && (
-                <ImageUpload 
-                  onImageUploaded={handleImageUploaded} 
+                <ImageUpload
+                  onImageUploaded={handleImageUploaded}
                   onImageRemoved={handleReset}
                   isLoading={classifying}
                 />
@@ -189,7 +196,7 @@ export default function ClassifyPage() {
 
               {/* Camera Section */}
               {uploadTab === 'camera' && (
-                <CameraCapture 
+                <CameraCapture
                   onImageUploaded={handleImageUploaded}
                   isLoading={classifying}
                 />
@@ -255,7 +262,7 @@ export default function ClassifyPage() {
                   <Download className="mr-2 h-4 w-4" />
                   Download Result
                 </Button>
-                <Button className="w-full text-sm">
+                <Button className="w-full text-sm" onClick={() => setPickupSheetOpen(true)}>
                   <ArrowRight className="mr-2 h-4 w-4" />
                   Request Pickup
                 </Button>
@@ -307,7 +314,7 @@ export default function ClassifyPage() {
                           alt="Waste"
                           className="hidden"
                         />
-                        
+
                         {/* Canvas for bounding boxes */}
                         {result ? (
                           <canvas
@@ -347,6 +354,15 @@ export default function ClassifyPage() {
           )}
         </div>
       </motion.div>
+
+      {/* Request Pickup Sheet */}
+      <RequestPickupSheet
+        open={pickupSheetOpen}
+        onOpenChange={setPickupSheetOpen}
+        classificationResult={result}
+        imageUrl={imageUrl}
+        onSuccess={handlePickupSuccess}
+      />
     </div>
   );
 }

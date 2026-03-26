@@ -53,7 +53,6 @@ const roleNavConfig: Record<string, NavItem[]> = {
       label: "Pickup Requests",
       href: "/citizen/pickups",
       icon: Truck,
-      comingSoon: true,
     },
     {
       label: "Rewards & Impact",
@@ -68,13 +67,11 @@ const roleNavConfig: Record<string, NavItem[]> = {
       label: "Assigned Pickups",
       href: "/collector/pickups",
       icon: Truck,
-      comingSoon: true,
     },
     {
       label: "Routes & Navigation",
       href: "/collector/routes",
       icon: MapPin,
-      comingSoon: true,
     },
   ],
   dealer: [
@@ -104,7 +101,6 @@ const roleNavConfig: Record<string, NavItem[]> = {
       label: "Hubs & Inventory",
       href: "/admin/hubs",
       icon: Truck,
-      comingSoon: true,
     },
   ],
 };
@@ -122,7 +118,7 @@ export function AppShell({ children }: AppShellProps) {
     <SidebarProvider>
       <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
-           <Link href="/"className="flex items-center gap-2 ">
+          <Link href="/" className="flex items-center gap-2 ">
             <div className="h-8 min-w-8 rounded-full bg-background flex items-center justify-center overflow-hidden border border-border">
               <img
                 src="/favicon.svg"
@@ -191,7 +187,7 @@ export function AppShell({ children }: AppShellProps) {
                   className="text-[10px] truncate"
                   style={{ color: roleConfig.color }}
                 >
-                  
+
                   {roleConfig.label}
                 </span>
               </div>
@@ -202,46 +198,46 @@ export function AppShell({ children }: AppShellProps) {
       <SidebarInset>
         <div className="w-full h-full ">
 
-    
-        <div className="min-h-screen border rounded flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 relative ">
-          <header className="border-b bg-background/80 dark:bg-card/80 backdrop-blur flex items-center justify-between p-3 md:px-5 sticky top-0">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger />
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">
-                  {APP_NAME} Dashboard
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  Data-driven circular waste management
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  "hidden md:inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border",
-                  "bg-white/50 dark:bg-slate-800/50 backdrop-blur"
-                )}
-              >
-                <span
-                  className="mr-1 inline-block h-2 w-2 rounded-full border border-white"
-                  style={{ backgroundColor: roleConfig.color }}
-                />
-                {roleConfig.label}
-              </span>
 
-             <ThemeToggle />
-            </div>
-          </header>
-          <main className="flex-1 px-4 py-4 md:px-8 md:py-8">
-            {children}
-          </main>
-          {/* <footer className="border-t bg-background/80 backdrop-blur px-4 py-3 md:px-6 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+          <div className="min-h-screen border rounded flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 relative ">
+            <header className="border-b bg-background/80 dark:bg-card/80 backdrop-blur flex items-center justify-between p-3 md:px-5 sticky top-0">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger />
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">
+                    {APP_NAME} Dashboard
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Data-driven circular waste management
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <span
+                  className={cn(
+                    "hidden md:inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border",
+                    "bg-white/50 dark:bg-slate-800/50 backdrop-blur"
+                  )}
+                >
+                  <span
+                    className="mr-1 inline-block h-2 w-2 rounded-full border border-white"
+                    style={{ backgroundColor: roleConfig.color }}
+                  />
+                  {roleConfig.label}
+                </span>
+
+                <ThemeToggle />
+              </div>
+            </header>
+            <main className="flex-1 px-4 py-4 md:px-8 md:py-8">
+              {children}
+            </main>
+            {/* <footer className="border-t bg-background/80 backdrop-blur px-4 py-3 md:px-6 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
             <span>© {new Date().getFullYear()} {APP_NAME}. All rights reserved.</span>
             <span>Phases 1–2 live · Phases 3–6 coming soon.</span>
           </footer> */}
+          </div>
         </div>
-            </div>
       </SidebarInset>
     </SidebarProvider>
   );

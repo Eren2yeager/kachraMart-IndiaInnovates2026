@@ -285,7 +285,7 @@ function CreateHubSheet({
           <SheetDescription>Add a new waste collection hub to the network.</SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-4 py-4">
+        <div className="flex flex-col gap-4 p-4">
           <div className="space-y-1.5">
             <Label htmlFor="hub-name">Hub Name</Label>
             <Input id="hub-name" placeholder="e.g. North Delhi Hub" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
@@ -419,7 +419,7 @@ function HubDetailSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-5 py-4">
+        <div className="flex flex-col gap-5 p-4">
           {/* Utilization summary */}
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-lg bg-muted/50 p-2">

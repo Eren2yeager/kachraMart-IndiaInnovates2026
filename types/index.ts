@@ -74,6 +74,7 @@ export interface IWasteInventory {
   quantity: number; // in kg
   hubId: string;
   verified: boolean;
+  reserved: boolean;
   sourceListings: string[]; // Array of WasteListing IDs
   createdAt: Date;
   updatedAt: Date;
@@ -117,16 +118,71 @@ export interface AIResponse {
   time: number;
 }
 
-// Analytics data
-export interface AnalyticsData {
+// Analytics data types
+export interface MonthlyDataPoint {
+  month: string;
+  quantity: number;
+}
+
+export interface WeeklyDataPoint {
+  week: string;
+  quantity: number;
+}
+
+export interface MonthlySpendingPoint {
+  month: string;
+  spent: number;
+}
+
+export interface HubPerformanceMetric {
+  hubId: string;
+  name: string;
+  capacity: number;
+  currentLoad: number;
+  utilizationPercentage: number;
+  status: 'normal' | 'warning' | 'critical';
+}
+
+export interface OrderStatistics {
+  totalOrders: number;
+  pendingOrders: number;
+  approvedOrders: number;
+  rejectedOrders: number;
+  completedOrders: number;
+  approvalRate: number;
+  averageOrderValue: number;
+}
+
+export interface TopDealer {
+  dealerId: string;
+  dealerName: string;
+  totalQuantity: number;
+  totalSpent: number;
+}
+
+export interface AdminAnalyticsData {
   totalWasteCollected: number;
-  recyclingRate: number;
-  landfillDiverted: number;
   co2Saved: number;
+  landfillDiverted: number;
+  diversionPercentage: number;
   wasteByType: Record<WasteType, number>;
-  monthlyTrend: Array<{
-    month: string;
-    collected: number;
-    recycled: number;
-  }>;
+  wasteByStatus: Record<WasteStatus, { count: number; quantity: number }>;
+  monthlyTrend: MonthlyDataPoint[];
+  weeklyTrend?: WeeklyDataPoint[];
+  hubPerformance: HubPerformanceMetric[];
+  orderStats: OrderStatistics;
+  topDealers: TopDealer[];
+  lastUpdated: string;
+}
+
+export interface DealerAnalyticsData {
+  totalPurchases: {
+    totalQuantity: number;
+    totalSpent: number;
+    orderCount: number;
+  };
+  purchasesByType: Record<WasteType, { quantity: number; spent: number }>;
+  spendingTrend: MonthlySpendingPoint[];
+  averagePriceByType: Record<WasteType, number>;
+  lastUpdated: string;
 }

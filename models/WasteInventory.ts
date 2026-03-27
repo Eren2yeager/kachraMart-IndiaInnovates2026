@@ -22,6 +22,11 @@ const WasteInventorySchema = new Schema<IWasteInventory>(
             type: Boolean,
             default: false,
         },
+        reserved: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
         sourceListings: [{ type: String }],
     },
     { timestamps: true }

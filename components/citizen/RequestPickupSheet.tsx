@@ -134,8 +134,8 @@ export function RequestPickupSheet({
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-                <SheetHeader className="pb-2">
+            <SheetContent side="right" className="w-full  sm:max-w-md overflow-y-auto">
+                <SheetHeader className="">
                     <SheetTitle className="flex items-center gap-2">
                         <Package className="h-5 w-5 text-primary" />
                         Request Pickup
@@ -145,7 +145,7 @@ export function RequestPickupSheet({
                     </SheetDescription>
                 </SheetHeader>
 
-                <div className="flex flex-col gap-5 py-4">
+                <div className="flex flex-col gap-5 p-4">
                     {/* AI Classification Summary */}
                     {classificationResult && (
                         <Card className="border-2" style={{ borderColor: wasteConfig.color }}>

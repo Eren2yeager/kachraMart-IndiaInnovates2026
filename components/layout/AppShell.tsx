@@ -80,13 +80,16 @@ const roleNavConfig: Record<string, NavItem[]> = {
       label: "Waste Marketplace",
       href: "/dealer/marketplace",
       icon: ShoppingBag,
-      comingSoon: true,
     },
     {
       label: "Orders",
       href: "/dealer/orders",
       icon: Recycle,
-      comingSoon: true,
+    },
+    {
+      label: "Analytics",
+      href: "/dealer/analytics",
+      icon: BarChart3,
     },
   ],
   admin: [
@@ -95,12 +98,16 @@ const roleNavConfig: Record<string, NavItem[]> = {
       label: "Waste Flow Analytics",
       href: "/admin/analytics",
       icon: BarChart3,
-      comingSoon: true,
     },
     {
       label: "Hubs & Inventory",
       href: "/admin/hubs",
       icon: Truck,
+    },
+    {
+      label: "Orders Management",
+      href: "/admin/orders",
+      icon: Recycle,
     },
   ],
 };
@@ -138,7 +145,7 @@ export function AppShell({ children }: AppShellProps) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            {/* <SidebarGroupLabel>Navigation</SidebarGroupLabel> */}
             <SidebarGroupContent>
               <SidebarMenu>
                 {navItems.map((item) => {
@@ -199,8 +206,8 @@ export function AppShell({ children }: AppShellProps) {
         <div className="w-full h-full ">
 
 
-          <div className="min-h-screen border rounded flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 relative ">
-            <header className="border-b bg-background/80 dark:bg-card/80 backdrop-blur flex items-center justify-between p-3 md:px-5 sticky top-0">
+          <div className="min-h-screen border-l-5 border border-l rounded-lg flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 relative ">
+            <header className=" bg-background/80 dark:bg-card/80 backdrop-blur flex items-center justify-between p-3 md:px-5 sticky top-0">
               <div className="flex items-center gap-2">
                 <SidebarTrigger />
                 <div className="flex flex-col">
@@ -232,10 +239,7 @@ export function AppShell({ children }: AppShellProps) {
             <main className="flex-1 px-4 py-4 md:px-8 md:py-8">
               {children}
             </main>
-            {/* <footer className="border-t bg-background/80 backdrop-blur px-4 py-3 md:px-6 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
-            <span>© {new Date().getFullYear()} {APP_NAME}. All rights reserved.</span>
-            <span>Phases 1–2 live · Phases 3–6 coming soon.</span>
-          </footer> */}
+
           </div>
         </div>
       </SidebarInset>

@@ -15,6 +15,7 @@ import {
   Sparkles,
   Archive,
   Building2,
+  Map as MapIcon,
 } from 'lucide-react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { PickupStatusTimeline } from '@/components/shared/PickupStatusTimeline';
@@ -34,6 +35,8 @@ import { IWasteListing, IHub, WasteType } from '@/types';
 import { WASTE_TYPES, REWARD_POINTS } from '@/config/constants';
 import { formatCurrency, formatWeight, formatDateTime, calculateDistance } from '@/lib/utils';
 import { animations } from '@/lib/theme';
+import { GoogleMapProvider } from '@/components/maps/GoogleMapProvider';
+import { CollectorNavigationMap } from '@/components/maps/CollectorNavigationMap';
 
 function PickupCard({
   pickup,
@@ -203,6 +206,7 @@ function CollectorPickupsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [collectorCoords, setCollectorCoords] = useState<[number, number] | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   const fetchPickups = useCallback(async () => {
     setError(null);
@@ -257,6 +261,9 @@ function CollectorPickupsContent() {
   const assigned = pickups.filter((p) => p.status === 'collector_assigned');
   const pickedUp = pickups.filter((p) => p.status === 'picked_up');
 
+  // Get next pickup for map display
+  const nextPickup = assigned.length > 0 ? assigned[0] : null;
+
   return (
     <div className="space-y-6">
       <motion.div {...animations.fadeIn} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -269,10 +276,22 @@ function CollectorPickupsContent() {
             Your active pickup tasks. Confirm collection and mark deliveries.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchPickups} disabled={loading}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          {nextPickup && collectorCoords && (
+            <Button
+              variant={showMap ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowMap(!showMap)}
+            >
+              <MapIcon className="mr-2 h-4 w-4" />
+              {showMap ? 'Hide Map' : 'Show Map'}
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={fetchPickups} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </motion.div>
 
       {pickups.length > 0 && (
@@ -287,6 +306,29 @@ function CollectorPickupsContent() {
             <CardContent className="pt-4 pb-3 text-center">
               <p className="text-2xl font-bold text-green-700 dark:text-green-300">{pickedUp.length}</p>
               <p className="text-xs text-green-600 dark:text-green-400">Collected</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Navigation Map */}
+      {showMap && nextPickup && collectorCoords && nextPickup.pickupLocation?.coordinates && (
+        <motion.div {...animations.slideUp}>
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <MapIcon className="h-5 w-5 text-primary" />
+                Route to Next Pickup
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <GoogleMapProvider>
+                <CollectorNavigationMap
+                  pickupId={nextPickup._id}
+                  collectorLocation={collectorCoords}
+                  pickupLocation={nextPickup.pickupLocation.coordinates}
+                />
+              </GoogleMapProvider>
             </CardContent>
           </Card>
         </motion.div>

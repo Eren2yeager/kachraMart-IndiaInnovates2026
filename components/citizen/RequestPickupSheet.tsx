@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, Loader2, Sparkles, Package, IndianRupee, Navigation } from 'lucide-react';
+import { MapPin, Loader2, Sparkles, Package, IndianRupee, Navigation, Map as MapIcon } from 'lucide-react';
 import {
     Sheet,
     SheetContent,
@@ -20,6 +20,8 @@ import { ClassificationResult } from '@/lib/roboflow';
 import { IWasteListing, WasteType } from '@/types';
 import { WASTE_TYPES, WASTE_PRICES, REWARD_POINTS } from '@/config/constants';
 import { formatCurrency, formatWeight } from '@/lib/utils';
+import { GoogleMapProvider } from '@/components/maps/GoogleMapProvider';
+import { LocationPicker } from '@/components/maps/LocationPicker';
 
 interface RequestPickupSheetProps {
     open: boolean;
@@ -43,6 +45,7 @@ export function RequestPickupSheet({
     const [locating, setLocating] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showMapPicker, setShowMapPicker] = useState(false);
 
     const wasteType = classificationResult?.wasteType ?? 'recyclable';
     const wasteConfig = WASTE_TYPES[wasteType as WasteType];
@@ -79,6 +82,12 @@ export function RequestPickupSheet({
             },
             { timeout: 10000 }
         );
+    };
+
+    const handleLocationSelect = (coords: [number, number], addr: string) => {
+        setCoordinates(coords);
+        setAddress(addr);
+        setShowMapPicker(false);
     };
 
     const handleSubmit = async () => {
@@ -214,21 +223,47 @@ export function RequestPickupSheet({
                     {/* Pickup Location */}
                     <div className="space-y-2">
                         <Label>Pickup Location</Label>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                            onClick={handleGetLocation}
-                            disabled={locating}
-                        >
-                            {locating ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                <Navigation className="mr-2 h-4 w-4" />
-                            )}
-                            {locating ? 'Getting location...' : 'Use My Current Location'}
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={handleGetLocation}
+                                disabled={locating}
+                            >
+                                {locating ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Navigation className="mr-2 h-4 w-4" />
+                                )}
+                                {locating ? 'Getting...' : 'Current Location'}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => setShowMapPicker(!showMapPicker)}
+                            >
+                                <MapIcon className="mr-2 h-4 w-4" />
+                                {showMapPicker ? 'Hide Map' : 'Pick on Map'}
+                            </Button>
+                        </div>
+
+                        {showMapPicker && (
+                            <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+                                <GoogleMapProvider>
+                                    <LocationPicker
+                                        initialLocation={coordinates || undefined}
+                                        onLocationSelect={handleLocationSelect}
+                                        searchEnabled={true}
+                                        className="w-full h-[400px]"
+                                        zoom={13}
+                                    />
+                                </GoogleMapProvider>
+                            </div>
+                        )}
 
                         <div className="relative">
                             <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />

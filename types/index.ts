@@ -25,6 +25,14 @@ export type OrderStatus =
   | 'rejected' 
   | 'completed';
 
+// Collector task status
+export type CollectorTaskStatus = 
+  | 'assigned' 
+  | 'accepted' 
+  | 'on_the_way' 
+  | 'picked' 
+  | 'delivered';
+
 // Location type
 export interface Location {
   type: 'Point';
@@ -103,6 +111,30 @@ export interface IHub {
   capacity: number; // in kg
   currentLoad: number; // in kg
   managerId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Collector task interface
+export interface ICollectorTask {
+  _id: string;
+  collectorId: string;
+  collector?: IUser;
+  wasteListingId: string;
+  wasteListing?: IWasteListing;
+  status: CollectorTaskStatus;
+  route?: {
+    distance: number; // in km
+    duration: number; // in minutes
+    polyline: string; // Encoded polyline
+  };
+  currentLocation?: [number, number]; // [longitude, latitude]
+  locationHistory?: Array<{
+    coordinates: [number, number];
+    timestamp: Date;
+  }>;
+  startedAt?: Date;
+  completedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

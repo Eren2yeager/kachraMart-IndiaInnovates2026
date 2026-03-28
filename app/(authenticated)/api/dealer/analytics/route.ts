@@ -127,6 +127,19 @@ export async function GET(req: NextRequest) {
     const trendAnalyzer = new TrendAnalyzer();
     const spendingTrend = await trendAnalyzer.getDealerSpendingTrend(dealerId);
     
+    // Get pending and approved orders count
+    const pendingOrders = await Order.countDocuments({
+      dealerId,
+      status: 'pending'
+    });
+    
+    const approvedOrders = await Order.countDocuments({
+      dealerId,
+      status: 'approved'
+    });
+    
+    const totalOrders = await Order.countDocuments({ dealerId });
+    
     // Build response
     const analytics: DealerAnalyticsData = {
       totalPurchases,
@@ -136,7 +149,16 @@ export async function GET(req: NextRequest) {
       lastUpdated: new Date().toISOString()
     };
     
-    return NextResponse.json(analytics);
+    // Add dashboard-specific stats
+    const dashboardStats = {
+      totalOrders,
+      pendingOrders,
+      completedOrders: totalPurchases.orderCount,
+      totalSpent: totalPurchases.totalSpent,
+      ...analytics
+    };
+    
+    return NextResponse.json(dashboardStats);
   } catch (error) {
     console.error('Dealer analytics error:', error);
     return NextResponse.json(

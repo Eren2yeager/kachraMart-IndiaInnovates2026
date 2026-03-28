@@ -138,15 +138,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Get API key from environment
-    const apiKey = process.env.GOOGLE_MAP_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
     if (!apiKey) {
       // Validates: Requirement 15.2 (Display error message to developer for invalid API key)
       // Validates: Requirement 15.4 (Log errors to console for debugging)
-      console.error('GOOGLE_MAP_API_KEY is not configured in environment variables');
+      console.error('NEXT_PUBLIC_GOOGLE_MAP_API_KEY is not configured in environment variables');
       return NextResponse.json(
         {
           status: 'error',
-          message: 'Map service is not configured. Please check GOOGLE_MAP_API_KEY environment variable.',
+          message: 'Map service is not configured. Please check NEXT_PUBLIC_GOOGLE_MAP_API_KEY environment variable.',
         } as ReverseGeocodeResponse,
         { status: 500 }
       );

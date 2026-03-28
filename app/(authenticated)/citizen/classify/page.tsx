@@ -254,14 +254,14 @@ export default function ClassifyPage() {
             {result && (
               <motion.div {...animations.slideUp} className="space-y-3">
 
-                <Button
+                {/* <Button
                   variant="outline"
                   className="w-full text-sm"
                   onClick={downloadImage}
                 >
                   <Download className="mr-2 h-4 w-4" />
                   Download Result
-                </Button>
+                </Button> */}
                 <Button className="w-full text-sm" onClick={() => setPickupSheetOpen(true)}>
                   <ArrowRight className="mr-2 h-4 w-4" />
                   Request Pickup

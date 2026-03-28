@@ -31,6 +31,9 @@ import {
   Shield,
   ShoppingBag,
   Truck,
+  User,
+  LayoutDashboard,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -47,7 +50,7 @@ type NavItem = {
 
 const roleNavConfig: Record<string, NavItem[]> = {
   citizen: [
-    { label: "Dashboard", href: "/dashboard", icon: Shield },
+    { label: "Dashboard", href: "/citizen/dashboard", icon: LayoutDashboard },
     { label: "AI Classification", href: "/citizen/classify", icon: Recycle },
     {
       label: "Pickup Requests",
@@ -58,13 +61,18 @@ const roleNavConfig: Record<string, NavItem[]> = {
       label: "Rewards & Impact",
       href: "/citizen/rewards",
       icon: Leaf,
-      comingSoon: true,
     },
+    { label: "Profile", href: "/me/profile", icon: User },
   ],
   collector: [
-    { label: "Dashboard", href: "/dashboard", icon: Shield },
+    { label: "Dashboard", href: "/collector/dashboard", icon: LayoutDashboard },
     {
-      label: "Assigned Pickups",
+      label: "Available Pickups",
+      href: "/collector/available",
+      icon: Package,
+    },
+    {
+      label: "My Pickups",
       href: "/collector/pickups",
       icon: Truck,
     },
@@ -73,9 +81,10 @@ const roleNavConfig: Record<string, NavItem[]> = {
       href: "/collector/routes",
       icon: MapPin,
     },
+    { label: "Profile", href: "/me/profile", icon: User },
   ],
   dealer: [
-    { label: "Dashboard", href: "/dashboard", icon: Shield },
+    { label: "Dashboard", href: "/dealer/dashboard", icon: LayoutDashboard },
     {
       label: "Waste Marketplace",
       href: "/dealer/marketplace",
@@ -91,9 +100,10 @@ const roleNavConfig: Record<string, NavItem[]> = {
       href: "/dealer/analytics",
       icon: BarChart3,
     },
+    { label: "Profile", href: "/me/profile", icon: User },
   ],
   admin: [
-    { label: "Dashboard", href: "/dashboard", icon: Shield },
+    { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     {
       label: "Waste Flow Analytics",
       href: "/admin/analytics",
@@ -109,6 +119,7 @@ const roleNavConfig: Record<string, NavItem[]> = {
       href: "/admin/orders",
       icon: Recycle,
     },
+    { label: "Profile", href: "/me/profile", icon: User },
   ],
 };
 
@@ -206,7 +217,7 @@ export function AppShell({ children }: AppShellProps) {
         <div className="w-full h-full ">
 
 
-          <div className="min-h-screen border-l-5 border border-l rounded-lg flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 relative ">
+          <div className="min-h-screen border-l rounded-lg flex flex-col bg-linear-to-br from-green-50 via-blue-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 relative ">
             <header className=" bg-background/80 dark:bg-card/80 backdrop-blur flex items-center justify-between p-3 md:px-5 sticky top-0 z-50">
               <div className="flex items-center gap-2">
                 <SidebarTrigger />

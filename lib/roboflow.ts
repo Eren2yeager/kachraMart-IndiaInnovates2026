@@ -62,8 +62,6 @@ export interface ClassificationResult {
  */
 export async function classifyWaste(imageUrl: string): Promise<ClassificationResult> {
   try {
-    console.log('Classifying image:', imageUrl);
-    console.log('Using API key:', process.env.ROBOFLOW_API_KEY ? 'Present' : 'Missing');
 
     // Try the workflow endpoint with proper formatting
     const requestBody = {
@@ -76,7 +74,6 @@ export async function classifyWaste(imageUrl: string): Promise<ClassificationRes
       },
     };
 
-    console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(
       'https://serverless.roboflow.com/sanar-gautam/workflows/find-circuit-boards-concretes-papers-plastic-bottles-plastic-bags-cardboards-batteries-bricks-mobile-phones-fruit-peels-food-wastes-and-metal-cans',
@@ -89,8 +86,6 @@ export async function classifyWaste(imageUrl: string): Promise<ClassificationRes
       }
     );
 
-    console.log('Roboflow response status:', response.status);
-    console.log('Roboflow response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -114,7 +109,6 @@ export async function classifyWaste(imageUrl: string): Promise<ClassificationRes
     }
 
     const result = await response.json();
-    console.log('Roboflow result:', JSON.stringify(result, null, 2));
 
     // Extract predictions from the workflow response
     // The response structure is: result.outputs[0].predictions.predictions (array of detections)
@@ -127,7 +121,6 @@ export async function classifyWaste(imageUrl: string): Promise<ClassificationRes
     // Get the detections array - it's nested under predictions.predictions
     const detections = predictionsData.predictions || [];
 
-    console.log('Detections found:', detections.length);
     
     if (!detections || detections.length === 0) {
       throw new Error('No waste items detected in the image');
@@ -139,7 +132,6 @@ export async function classifyWaste(imageUrl: string): Promise<ClassificationRes
       image: predictionsData.image || { height: 0, width: 0 }
     };
     
-    console.log('Parsed predictions:', JSON.stringify(predictions, null, 2));
 
     // Map detected items to waste categories
     const detectedItems = predictions.detections.map((detection) => {

@@ -5,7 +5,20 @@ import { cn } from '@/lib/utils/cn';
 import { WasteStatus } from '@/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-const STEPS: { status: WasteStatus; label: string; shortLabel: string }[] = [
+const CITIZEN_STEPS: { status: WasteStatus; label: string; shortLabel: string }[] = [
+    { status: 'pending', label: 'Pending', shortLabel: 'Pending' },
+    { status: 'collector_assigned', label: 'Collector Assigned', shortLabel: 'Assigned' },
+    { status: 'picked_up', label: 'Picked Up', shortLabel: 'Picked Up' },
+    { status: 'stored_in_hub', label: 'Stored in Hub', shortLabel: 'Completed' },
+];
+
+const COLLECTOR_STEPS: { status: WasteStatus; label: string; shortLabel: string }[] = [
+    { status: 'collector_assigned', label: 'Assigned to You', shortLabel: 'Assigned' },
+    { status: 'picked_up', label: 'Picked Up', shortLabel: 'Picked Up' },
+    { status: 'stored_in_hub', label: 'Stored in Hub', shortLabel: 'Stored' },
+];
+
+const ALL_STEPS: { status: WasteStatus; label: string; shortLabel: string }[] = [
     { status: 'pending', label: 'Pending', shortLabel: 'Pending' },
     { status: 'collector_assigned', label: 'Collector Assigned', shortLabel: 'Assigned' },
     { status: 'picked_up', label: 'Picked Up', shortLabel: 'Picked Up' },
@@ -13,7 +26,25 @@ const STEPS: { status: WasteStatus; label: string; shortLabel: string }[] = [
     { status: 'sold_to_dealer', label: 'Sold to Dealer', shortLabel: 'Sold' },
 ];
 
-const STATUS_INDEX: Record<WasteStatus, number> = {
+const STATUS_INDEX_CITIZEN: Record<WasteStatus, number> = {
+    pending: 0,
+    collector_assigned: 1,
+    picked_up: 2,
+    stored_in_hub: 3,
+    sold_to_dealer: 3, // Map to completed for citizen
+    cancelled: -1,
+};
+
+const STATUS_INDEX_COLLECTOR: Record<WasteStatus, number> = {
+    pending: 0, // Not shown but mapped
+    collector_assigned: 0,
+    picked_up: 1,
+    stored_in_hub: 2,
+    sold_to_dealer: 2, // Map to stored for collector
+    cancelled: -1,
+};
+
+const STATUS_INDEX_ALL: Record<WasteStatus, number> = {
     pending: 0,
     collector_assigned: 1,
     picked_up: 2,
@@ -25,9 +56,13 @@ const STATUS_INDEX: Record<WasteStatus, number> = {
 interface PickupStatusTimelineProps {
     status: WasteStatus;
     compact?: boolean;
+    variant?: 'citizen' | 'collector' | 'all';
 }
 
-export function PickupStatusTimeline({ status, compact = false }: PickupStatusTimelineProps) {
+export function PickupStatusTimeline({ status, compact = false, variant = 'all' }: PickupStatusTimelineProps) {
+    // Select the appropriate steps and index based on variant
+    const STEPS = variant === 'citizen' ? CITIZEN_STEPS : variant === 'collector' ? COLLECTOR_STEPS : ALL_STEPS;
+    const STATUS_INDEX = variant === 'citizen' ? STATUS_INDEX_CITIZEN : variant === 'collector' ? STATUS_INDEX_COLLECTOR : STATUS_INDEX_ALL;
     const currentIndex = STATUS_INDEX[status];
 
     if (status === 'cancelled') {
@@ -45,8 +80,8 @@ export function PickupStatusTimeline({ status, compact = false }: PickupStatusTi
         return (
             <div className="flex items-center gap-1">
                 {STEPS.map((step, index) => {
-                    const isDone = index < currentIndex;
-                    const isCurrent = index === currentIndex;
+                    const isDone = index < currentIndex || (index === currentIndex && index === STEPS.length - 1);
+                    const isCurrent = index === currentIndex && index < STEPS.length - 1;
                     return (
                         <TooltipProvider key={step.status} delayDuration={200}>
                             <Tooltip>
@@ -95,8 +130,8 @@ export function PickupStatusTimeline({ status, compact = false }: PickupStatusTi
                 />
 
                 {STEPS.map((step, index) => {
-                    const isDone = index < currentIndex;
-                    const isCurrent = index === currentIndex;
+                    const isDone = index < currentIndex || (index === currentIndex && index === STEPS.length - 1);
+                    const isCurrent = index === currentIndex && index < STEPS.length - 1;
                     return (
                         <div key={step.status} className="flex flex-col items-center gap-1.5 z-10 flex-1">
                             <div

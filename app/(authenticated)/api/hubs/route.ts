@@ -7,7 +7,7 @@ import WasteInventory from '@/models/WasteInventory';
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();
-        if (!session?.user?.id || session.user.role !== 'admin') {
+        if (!session?.user?.id) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -15,29 +15,42 @@ export async function GET(req: NextRequest) {
 
         const hubs = await Hub.find().sort({ currentLoad: -1 }).lean();
 
-        const hubsWithSummary = await Promise.all(
-            hubs.map(async (hub) => {
-                const inventories = await WasteInventory.find({ hubId: hub._id.toString() }).lean();
-                const inventorySummary = inventories.map((inv) => ({
-                    _id: inv._id.toString(),
-                    wasteType: inv.wasteType,
-                    quantity: inv.quantity,
-                    verified: inv.verified,
-                }));
-                const utilizationPct =
-                    hub.capacity > 0
-                        ? Math.min(100, Math.round((hub.currentLoad / hub.capacity) * 1000) / 10)
-                        : 0;
-                return {
-                    ...hub,
-                    _id: hub._id.toString(),
-                    inventorySummary,
-                    utilizationPct,
-                };
-            })
-        );
+        // For admin, include detailed inventory summary
+        if (session.user.role === 'admin') {
+            const hubsWithSummary = await Promise.all(
+                hubs.map(async (hub) => {
+                    const inventories = await WasteInventory.find({ hubId: hub._id.toString() }).lean();
+                    const inventorySummary = inventories.map((inv) => ({
+                        _id: inv._id.toString(),
+                        wasteType: inv.wasteType,
+                        quantity: inv.quantity,
+                        verified: inv.verified,
+                    }));
+                    const utilizationPct =
+                        hub.capacity > 0
+                            ? Math.min(100, Math.round((hub.currentLoad / hub.capacity) * 1000) / 10)
+                            : 0;
+                    return {
+                        ...hub,
+                        _id: hub._id.toString(),
+                        inventorySummary,
+                        utilizationPct,
+                    };
+                })
+            );
+            return NextResponse.json({ hubs: hubsWithSummary });
+        }
 
-        return NextResponse.json({ hubs: hubsWithSummary });
+        // For other roles (dealer, etc.), return basic hub info
+        const basicHubs = hubs.map((hub) => ({
+            _id: hub._id.toString(),
+            name: hub.name,
+            location: hub.location,
+            capacity: hub.capacity,
+            currentLoad: hub.currentLoad,
+        }));
+
+        return NextResponse.json({ hubs: basicHubs });
     } catch (error: any) {
         console.error('GET /api/hubs error:', error);
         return NextResponse.json({ error: 'Failed to fetch hubs' }, { status: 500 });

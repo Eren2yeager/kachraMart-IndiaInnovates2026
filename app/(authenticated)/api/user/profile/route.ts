@@ -2,6 +2,7 @@ import connectDB from '@/lib/db/mongodb';
 import User from '@/models/User';
 import { auth } from '@/lib/auth';
 
+// PUT /api/user/profile — full profile update
 export async function PUT(request: Request) {
   try {
     const session = await auth();
@@ -24,6 +25,69 @@ export async function PUT(request: Request) {
     };
 
     if (image) updateData.image = image;
+
+    // Update location if provided with valid coordinates
+    if (
+      location &&
+      Array.isArray(location.coordinates) &&
+      location.coordinates.length === 2 &&
+      typeof location.coordinates[0] === 'number' &&
+      typeof location.coordinates[1] === 'number'
+    ) {
+      updateData.location = {
+        type: 'Point',
+        coordinates: location.coordinates,
+        address: location.address ?? '',
+      };
+    }
+
+    const user = await User.findOneAndUpdate(
+      { email: session.user.email },
+      updateData,
+      { new: true }
+    );
+
+    if (!user) {
+      return Response.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    return Response.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        image: user.image,
+        role: user.role,
+        location: user.location,
+      },
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    return Response.json({ error: 'Failed to update profile' }, { status: 500 });
+  }
+}
+
+// PATCH /api/user/profile — partial profile update
+export async function PATCH(request: Request) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.email) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { name, phone, image, location } = body;
+
+    await connectDB();
+
+    const updateData: any = {};
+
+    if (name !== undefined) updateData.name = name.trim();
+    if (phone !== undefined) updateData.phone = phone.trim();
+    if (image !== undefined) updateData.image = image;
 
     // Update location if provided with valid coordinates
     if (

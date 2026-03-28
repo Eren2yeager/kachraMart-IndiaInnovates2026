@@ -68,6 +68,7 @@ export interface IWasteListing {
   status: WasteStatus;
   collectorId?: string;
   collector?: IUser;
+  assignedHubId?: string; // Hub where waste should be delivered
   aiConfidence?: number;
   description?: string;
   estimatedValue?: number;

@@ -22,7 +22,7 @@ export default function HomePageContent() {
   const bgRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 md:px-10 md:pt-10">
+    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-green-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 md:px-10 md:pt-10">
       
       {/* PixelBlast Background */}
       <div
@@ -57,15 +57,15 @@ export default function HomePageContent() {
         {/* Hero Section */}
         <div className="grid gap-10 md:grid-cols-2  items-center mb-16">
           <div className="space-y-6">
-            <Badge
+            {/* <Badge
               variant={"secondary"}
               className="bg-emerald-100 relative z-2 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800 text-sm"
             >
-              Phase 1–2 live · AI classification ready
-            </Badge>
+              🚀 Fully Operational · Complete Waste Management Platform
+            </Badge> */}
 
             <h1 className="relative z-2 text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              <span className="block bg-gradient-to-r from-green-600 via-emerald-500 to-blue-600 dark:from-green-400 dark:via-emerald-400 dark:to-blue-400 bg-clip-text text-transparent">
+              <span className="block bg-linear-to-r from-green-600 via-emerald-500 to-blue-600 dark:from-green-400 dark:via-emerald-400 dark:to-blue-400 bg-clip-text text-transparent">
                 {APP_NAME}
               </span>
               <span className="mt-2 block text-slate-900 dark:text-slate-100">
@@ -74,9 +74,9 @@ export default function HomePageContent() {
             </h1>
 
             <p className="text-base relative z-2 md:text-lg dark:text-white/60 text-black/60 max-w-xl">
-              Use computer vision and optimized logistics to turn city waste
-              into a transparent, trackable resource stream for citizens,
-              collectors, recyclers, and administrators.
+              A complete end-to-end waste management ecosystem powered by AI classification, 
+              smart logistics, real-time tracking, and a circular marketplace connecting 
+              citizens, collectors, dealers, and administrators.
             </p>
 
             <div className="flex relative z-2 flex-wrap gap-3 pt-2">
@@ -120,12 +120,17 @@ export default function HomePageContent() {
             <div className="flex relative z-2  flex-wrap gap-4 pt-4 text-xs md:text-sm dark:text-white/60 text-black/60">
               <div className="flex items-center gap-2">
                 <span className=" h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-                AI waste classification (Phase 2)
+                AI-Powered Classification
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-amber-500 dark:bg-amber-400" />
-                Pickups, marketplace & analytics coming soon
+                <span className="h-2 w-2 rounded-full bg-blue-500 dark:bg-blue-400" />
+                Smart Pickup Routing
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-400" />
+                Live Marketplace
               </div>
             </div>
           </div>
@@ -136,11 +141,11 @@ export default function HomePageContent() {
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Lightbulb className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
-                  Smart circular waste flows
+                  Complete Circular Economy Platform
                 </CardTitle>
 
                 <CardDescription>
-                  One platform for citizens, collectors, dealers, and admins.
+                  Four interconnected roles working together seamlessly.
                 </CardDescription>
               </CardHeader>
 
@@ -152,7 +157,7 @@ export default function HomePageContent() {
                       Citizens
                     </p>
                     <p className="text-emerald-900/80 dark:text-emerald-200/80">
-                      Classify waste with AI and request doorstep pickups with rewards.
+                      AI waste classification, doorstep pickup scheduling, real-time tracking, and rewards.
                     </p>
                   </div>
 
@@ -161,7 +166,7 @@ export default function HomePageContent() {
                       Collectors
                     </p>
                     <p className="text-sky-900/80 dark:text-sky-200/80">
-                      Get optimized pickup routes and live task dashboards.
+                      Optimized routes, live task management, GPS tracking, and hub delivery coordination.
                     </p>
                   </div>
 
@@ -170,7 +175,7 @@ export default function HomePageContent() {
                       Dealers
                     </p>
                     <p className="text-violet-900/80 dark:text-violet-200/80">
-                      Browse verified inventory and manage purchase orders.
+                      Browse marketplace, purchase verified inventory, track orders, and manage transactions.
                     </p>
                   </div>
 
@@ -179,16 +184,22 @@ export default function HomePageContent() {
                       Admins
                     </p>
                     <p className="text-slate-700/80 dark:text-slate-300/80">
-                      Monitor hubs, waste flow, and sustainability impact.
+                      Hub management, analytics dashboards, order oversight, and impact reporting.
                     </p>
                   </div>
 
                 </div>
 
-                <p className="text-xs text-muted-foreground">
-                  Current demo flow: sign up → choose role → dashboard → citizen
-                  AI classification.
-                </p>
+                <div className="pt-2 space-y-2">
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Complete Workflow:
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Citizen classifies waste → Schedules pickup → Collector receives optimized route → 
+                    Collects & delivers to hub → Hub verifies inventory → Dealer browses marketplace → 
+                    Places order → Admin approves → Dealer completes transaction → Impact tracked.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -199,9 +210,9 @@ export default function HomePageContent() {
           <Card className=" relative z-2 bg-white/70 dark:bg-slate-900/70 border-emerald-100 dark:border-emerald-900 shadow-sm backdrop-blur-xs">
             <CardHeader>
               <Recycle className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-1" />
-              <CardTitle className="text-base">AI classification</CardTitle>
+              <CardTitle className="text-base">AI Classification</CardTitle>
               <CardDescription>
-                Roboflow-powered waste detection.
+                Roboflow-powered computer vision instantly identifies waste types from images.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -209,9 +220,9 @@ export default function HomePageContent() {
           <Card className="relative z-2 bg-white/70 dark:bg-slate-900/70 border-emerald-100 dark:border-emerald-900 shadow-sm backdrop-blur-xs">
             <CardHeader>
               <TrendingUp className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mb-1" />
-              <CardTitle className="text-base">Smart logistics</CardTitle>
+              <CardTitle className="text-base">Smart Logistics</CardTitle>
               <CardDescription>
-                Pickup assignment and route optimization.
+                Automated pickup assignment, route optimization, and real-time GPS tracking.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -219,9 +230,9 @@ export default function HomePageContent() {
           <Card className="relative z-2 bg-white/70 dark:bg-slate-900/70 border-emerald-100 dark:border-emerald-900 shadow-sm backdrop-blur-xs">
             <CardHeader>
               <Users className="h-8 w-8 text-purple-600 dark:text-purple-400 mb-1" />
-              <CardTitle className="text-base">Circular marketplace</CardTitle>
+              <CardTitle className="text-base">Live Marketplace</CardTitle>
               <CardDescription>
-                Dealers buy verified inventory from hubs.
+                Dealers purchase verified inventory with order management and transaction tracking.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -229,12 +240,66 @@ export default function HomePageContent() {
           <Card className="relative z-2 bg-white/70 dark:bg-slate-900/70 border-emerald-100 dark:border-emerald-900 shadow-sm backdrop-blur-xs">
             <CardHeader>
               <Leaf className="h-8 w-8 text-emerald-500 dark:text-emerald-400 mb-1" />
-              <CardTitle className="text-base">Impact analytics</CardTitle>
+              <CardTitle className="text-base">Impact Analytics</CardTitle>
               <CardDescription>
-                Track CO₂ reduction and waste diversion.
+                Comprehensive dashboards tracking CO₂ reduction, waste diversion, and sustainability metrics.
               </CardDescription>
             </CardHeader>
           </Card>
+        </div>
+
+        {/* How It Works Section */}
+        <div className="mb-16 relative z-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+            How KachraMart Works
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <Card className="bg-white/70 dark:bg-slate-900/70 border-emerald-100 dark:border-emerald-900">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500 text-white font-bold">
+                    1
+                  </div>
+                  <CardTitle className="text-base">Classify & Schedule</CardTitle>
+                </div>
+                <CardDescription>
+                  Citizens upload waste images for AI classification, then schedule convenient pickup times. 
+                  The system automatically creates pickup requests with location and waste details.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-white/70 dark:bg-slate-900/70 border-emerald-100 dark:border-emerald-900">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold">
+                    2
+                  </div>
+                  <CardTitle className="text-base">Collect & Deliver</CardTitle>
+                </div>
+                <CardDescription>
+                  Collectors receive optimized routes, pick up waste from citizens, and deliver to designated hubs. 
+                  Real-time GPS tracking keeps everyone informed throughout the journey.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-white/70 dark:bg-slate-900/70 border-emerald-100 dark:border-emerald-900">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500 text-white font-bold">
+                    3
+                  </div>
+                  <CardTitle className="text-base">Trade & Track</CardTitle>
+                </div>
+                <CardDescription>
+                  Hubs verify inventory quality. Dealers browse the marketplace and place orders. 
+                  Admins oversee transactions while tracking environmental impact metrics.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
         </div>
 
         {/* CTA */}
@@ -242,18 +307,18 @@ export default function HomePageContent() {
           <h2 className="text-2xl md:text-3xl font-bold relative z-2">
             {session
               ? "Welcome back to KachraMart!"
-              : "Ready to test the AI flow?"}
+              : "Ready to Transform Waste Management?"}
           </h2>
 
-          <p className=" relative z-2 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+          <p className=" relative z-2 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
             {session
-              ? "Continue managing your sustainability impact."
-              : "Upload a waste image and see AI classify it instantly."}
+              ? "Continue managing your sustainability impact with our complete platform."
+              : "Join the circular economy revolution. Start classifying waste, scheduling pickups, or trading verified inventory today."}
           </p>
 
           <Button asChild size="lg" className="relative z-2">
             <Link href={session ? "/dashboard" : "/auth/signup"}>
-              {session ? "Go to Dashboard" : "Create your account"}
+              {session ? "Go to Dashboard" : "Get Started Now"}
             </Link>
           </Button>
         </div>

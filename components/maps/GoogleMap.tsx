@@ -432,7 +432,16 @@ export const GoogleMap = React.memo(function GoogleMap({
         options={mapOptions}
       >
         {/* Render markers only when clustering is disabled or below threshold */}
-        {(!enableClustering || limitedMarkers.length < clusteringThreshold) && limitedMarkers.map((marker) => (
+        {(!enableClustering || limitedMarkers.length < clusteringThreshold) && limitedMarkers
+          .filter(marker => 
+            marker.coordinates && 
+            Array.isArray(marker.coordinates) && 
+            typeof marker.coordinates[0] === 'number' && 
+            typeof marker.coordinates[1] === 'number' &&
+            !isNaN(marker.coordinates[0]) &&
+            !isNaN(marker.coordinates[1])
+          )
+          .map((marker) => (
           <Marker
             key={marker.id}
             position={{ lat: marker.coordinates[1], lng: marker.coordinates[0] }}
@@ -443,7 +452,12 @@ export const GoogleMap = React.memo(function GoogleMap({
         ))}
 
         {/* Render user location marker */}
-        {userLocation && (
+        {userLocation && 
+         Array.isArray(userLocation) && 
+         typeof userLocation[0] === 'number' && 
+         typeof userLocation[1] === 'number' &&
+         !isNaN(userLocation[0]) &&
+         !isNaN(userLocation[1]) && (
           <Marker
             position={{ lat: userLocation[1], lng: userLocation[0] }}
             icon={{
@@ -469,7 +483,7 @@ export const GoogleMap = React.memo(function GoogleMap({
               strokeOpacity: 0.8,
             }}
           />
-        ))}
+        ))}ge
 
         {/* Info window for selected marker */}
         {selectedMarker && (

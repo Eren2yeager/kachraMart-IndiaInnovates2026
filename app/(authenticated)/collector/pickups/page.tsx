@@ -15,7 +15,8 @@ import {
   Sparkles,
   Archive,
   Building2,
-  Map as MapIcon,
+  X,
+  Phone,
 } from 'lucide-react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { PickupStatusTimeline } from '@/components/shared/PickupStatusTimeline';
@@ -33,23 +34,25 @@ import {
 } from '@/components/ui/select';
 import { IWasteListing, IHub, WasteType } from '@/types';
 import { WASTE_TYPES, REWARD_POINTS } from '@/config/constants';
-import { formatCurrency, formatWeight, formatDateTime, calculateDistance } from '@/lib/utils';
+import { formatCurrency, formatWeight, calculateDistance } from '@/lib/utils';
 import { animations } from '@/lib/theme';
-import { GoogleMapProvider } from '@/components/maps/GoogleMapProvider';
-import { CollectorNavigationMap } from '@/components/maps/CollectorNavigationMap';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 function PickupCard({
   pickup,
   collectorCoords,
   hubs,
   onConfirm,
+  onRemove,
 }: {
   pickup: IWasteListing;
   collectorCoords: [number, number] | null;
   hubs: IHub[];
   onConfirm: (id: string, action: 'picked_up' | 'stored_in_hub', hubId?: string) => Promise<void>;
+  onRemove: (id: string) => Promise<void>;
 }) {
   const [confirming, setConfirming] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const [selectedHubId, setSelectedHubId] = useState<string>('');
   const wasteConfig = WASTE_TYPES[pickup.wasteType as WasteType];
   const rewardPoints = (REWARD_POINTS[pickup.wasteType as WasteType] ?? 0) * Math.ceil(pickup.quantity);
@@ -73,14 +76,22 @@ function PickupCard({
     }
   };
 
-  const mapsUrl =
-    pickup.pickupLocation?.coordinates
-      ? `https://www.google.com/maps/dir/?api=1&destination=${pickup.pickupLocation.coordinates[1]},${pickup.pickupLocation.coordinates[0]}`
-      : null;
+  const handleRemove = async () => {
+    setRemoving(true);
+    try {
+      await onRemove(pickup._id);
+    } finally {
+      setRemoving(false);
+    }
+  };
+
+  const isCompleted = pickup.status === 'stored_in_hub';
+  const showRemoveButton = isCompleted;
+  const showNavigateButton = !isCompleted && pickup.pickupLocation?.coordinates;
 
   return (
     <motion.div layout {...animations.slideUp}>
-      <Card className="overflow-hidden">
+      <Card className={isCompleted ? 'opacity-60 overflow-hidden' : 'overflow-hidden'}>
         <div className="h-1 w-full" style={{ backgroundColor: wasteConfig.color }} />
 
         <CardHeader className="pb-3 pt-4">
@@ -107,20 +118,70 @@ function PickupCard({
               {distance && (
                 <span className="text-xs text-muted-foreground">{distance} km away</span>
               )}
+              {showRemoveButton && (
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={handleRemove}
+                  disabled={removing}
+                  className="text-muted-foreground hover:text-destructive"
+                  aria-label="Remove from list"
+                >
+                  {removing ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <PickupStatusTimeline status={pickup.status} />
+          <PickupStatusTimeline status={pickup.status} variant="collector" />
 
           <Separator />
 
           <div className="space-y-2 text-xs text-muted-foreground">
+            {/* Citizen Info */}
+            {pickup.user && (
+              <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-800 p-2.5 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={pickup.user.image} alt={pickup.user.name} />
+                    <AvatarFallback className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
+                      {pickup.user.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-blue-900 dark:text-blue-100 text-xs truncate">
+                      {pickup.user.name}
+                    </p>
+                    {pickup.user.phone && (
+                      <a
+                        href={`tel:${pickup.user.phone}`}
+                        className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        <Phone className="h-3 w-3" />
+                        <span>{pickup.user.phone}</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="flex items-start gap-1.5">
               <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
               <span className="line-clamp-2">{pickup.pickupLocation?.address ?? 'No address'}</span>
             </div>
+            
+            {pickup.assignedHubId && (
+              <div className="flex items-start gap-1.5 text-green-600 dark:text-green-400">
+                <Building2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                <span className="line-clamp-2">
+                  Deliver to: {hubs.find(h => h._id === pickup.assignedHubId)?.name || 'Assigned Hub'}
+                </span>
+              </div>
+            )}
+            
             <div className="flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-500" />
               <span className="text-amber-600 dark:text-amber-400">
@@ -129,12 +190,12 @@ function PickupCard({
             </div>
           </div>
 
-          {/* Hub selector for stored_in_hub action */}
-          {pickup.status === 'picked_up' && hubs.length > 0 && (
+          {/* Hub selector for stored_in_hub action - only if no hub assigned */}
+          {pickup.status === 'picked_up' && !pickup.assignedHubId && hubs.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <Building2 className="h-3.5 w-3.5" />
-                Select destination hub (optional)
+                Select destination hub
               </p>
               <Select value={selectedHubId} onValueChange={setSelectedHubId}>
                 <SelectTrigger className="w-full h-8 text-xs">
@@ -152,9 +213,9 @@ function PickupCard({
           )}
 
           <div className="flex gap-2 pt-1">
-            {mapsUrl && (
+            {showNavigateButton && (
               <Button variant="outline" size="sm" className="flex-1" asChild>
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
+                <a href={`/map?pickupId=${pickup._id}&mode=navigate`}>
                   <Navigation className="mr-1.5 h-3.5 w-3.5" />
                   Navigate
                 </a>
@@ -206,11 +267,11 @@ function CollectorPickupsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [collectorCoords, setCollectorCoords] = useState<[number, number] | null>(null);
-  const [showMap, setShowMap] = useState(false);
 
   const fetchPickups = useCallback(async () => {
     setError(null);
     try {
+      // Fetch all pickups including stored_in_hub
       const res = await fetch('/api/collector/pickups');
       if (!res.ok) throw new Error('Failed to fetch pickups');
       const data = await res.json();
@@ -258,11 +319,24 @@ function CollectorPickupsContent() {
     }
   };
 
+  const handleRemove = async (id: string) => {
+    if (!confirm('Remove this completed pickup from your list?')) return;
+    try {
+      const res = await fetch(`/api/listings/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setPickups((prev) => prev.filter((p) => p._id !== id));
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to remove pickup');
+      }
+    } catch (err) {
+      alert('Failed to remove pickup');
+    }
+  };
+
   const assigned = pickups.filter((p) => p.status === 'collector_assigned');
   const pickedUp = pickups.filter((p) => p.status === 'picked_up');
-
-  // Get next pickup for map display
-  const nextPickup = assigned.length > 0 ? assigned[0] : null;
+  const stored = pickups.filter((p) => p.status === 'stored_in_hub');
 
   return (
     <div className="space-y-6">
@@ -270,23 +344,13 @@ function CollectorPickupsContent() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
             <Truck className="h-7 w-7 text-primary" />
-            Assigned Pickups
+            My Pickups
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Your active pickup tasks. Confirm collection and mark deliveries.
+            Your accepted pickup tasks. Confirm collection and deliver to hubs.
           </p>
         </div>
         <div className="flex gap-2">
-          {nextPickup && collectorCoords && (
-            <Button
-              variant={showMap ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowMap(!showMap)}
-            >
-              <MapIcon className="mr-2 h-4 w-4" />
-              {showMap ? 'Hide Map' : 'Show Map'}
-            </Button>
-          )}
           <Button variant="outline" size="sm" onClick={fetchPickups} disabled={loading}>
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -295,40 +359,23 @@ function CollectorPickupsContent() {
       </motion.div>
 
       {pickups.length > 0 && (
-        <motion.div {...animations.slideUp} className="grid grid-cols-2 gap-3">
+        <motion.div {...animations.slideUp} className="grid grid-cols-3 gap-3">
           <Card className="bg-blue-50/60 dark:bg-blue-950/30 border-blue-100 dark:border-blue-800">
             <CardContent className="pt-4 pb-3 text-center">
               <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{assigned.length}</p>
               <p className="text-xs text-blue-600 dark:text-blue-400">To Collect</p>
             </CardContent>
           </Card>
-          <Card className="bg-green-50/60 dark:bg-green-950/30 border-green-100 dark:border-green-800">
+          <Card className="bg-amber-50/60 dark:bg-amber-950/30 border-amber-100 dark:border-amber-800">
             <CardContent className="pt-4 pb-3 text-center">
-              <p className="text-2xl font-bold text-green-700 dark:text-green-300">{pickedUp.length}</p>
-              <p className="text-xs text-green-600 dark:text-green-400">Collected</p>
+              <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{pickedUp.length}</p>
+              <p className="text-xs text-amber-600 dark:text-amber-400">Collected</p>
             </CardContent>
           </Card>
-        </motion.div>
-      )}
-
-      {/* Navigation Map */}
-      {showMap && nextPickup && collectorCoords && nextPickup.pickupLocation?.coordinates && (
-        <motion.div {...animations.slideUp}>
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <MapIcon className="h-5 w-5 text-primary" />
-                Route to Next Pickup
-              </h2>
-            </CardHeader>
-            <CardContent>
-              <GoogleMapProvider>
-                <CollectorNavigationMap
-                  pickupId={nextPickup._id}
-                  collectorLocation={collectorCoords}
-                  pickupLocation={nextPickup.pickupLocation.coordinates}
-                />
-              </GoogleMapProvider>
+          <Card className="bg-green-50/60 dark:bg-green-950/30 border-green-100 dark:border-green-800">
+            <CardContent className="pt-4 pb-3 text-center">
+              <p className="text-2xl font-bold text-green-700 dark:text-green-300">{stored.length}</p>
+              <p className="text-xs text-green-600 dark:text-green-400">Stored</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -386,6 +433,7 @@ function CollectorPickupsContent() {
                   collectorCoords={collectorCoords}
                   hubs={hubs}
                   onConfirm={handleConfirm}
+                  onRemove={handleRemove}
                 />
               ))}
             </AnimatePresence>
@@ -407,6 +455,29 @@ function CollectorPickupsContent() {
                   collectorCoords={collectorCoords}
                   hubs={hubs}
                   onConfirm={handleConfirm}
+                  onRemove={handleRemove}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {!loading && stored.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Completed — Stored in Hub ({stored.length})
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence>
+              {stored.map((p) => (
+                <PickupCard
+                  key={p._id}
+                  pickup={p}
+                  collectorCoords={collectorCoords}
+                  hubs={hubs}
+                  onConfirm={handleConfirm}
+                  onRemove={handleRemove}
                 />
               ))}
             </AnimatePresence>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Loader2, Sparkles, Package, IndianRupee, Navigation, Map as MapIcon } from 'lucide-react';
 import {
     Sheet,
@@ -42,6 +42,7 @@ export function RequestPickupSheet({
     const [address, setAddress] = useState('');
     const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
     const [description, setDescription] = useState('');
+    const [phone, setPhone] = useState('');
     const [locating, setLocating] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -105,12 +106,23 @@ export function RequestPickupSheet({
             setError('Please provide a pickup address');
             return;
         }
+        if (!phone.trim()) {
+            setError('Please provide your contact number');
+            return;
+        }
 
         // Use coordinates from geolocation or default to [0,0] with address
         const coords: [number, number] = coordinates ?? [0, 0];
 
         setSubmitting(true);
         try {
+            // First update user's phone number if provided
+            await fetch('/api/user/profile', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: phone.trim() }),
+            });
+
             const res = await fetch('/api/listings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -134,6 +146,7 @@ export function RequestPickupSheet({
             setAddress('');
             setCoordinates(null);
             setDescription('');
+            setPhone('');
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -298,6 +311,22 @@ export function RequestPickupSheet({
                         />
                     </div>
 
+                    {/* Contact Number */}
+                    <div className="space-y-1.5">
+                        <Label htmlFor="phone">Contact Number *</Label>
+                        <Input
+                            id="phone"
+                            type="tel"
+                            placeholder="Your phone number for collector to contact"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            maxLength={15}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Collector will use this to coordinate pickup
+                        </p>
+                    </div>
+
                     {/* Error */}
                     {error && (
                         <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md">
@@ -310,7 +339,7 @@ export function RequestPickupSheet({
                     <Button
                         className="w-full"
                         onClick={handleSubmit}
-                        disabled={submitting || !address.trim() || qty <= 0}
+                        disabled={submitting || !address.trim() || qty <= 0 || !phone.trim()}
                     >
                         {submitting ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

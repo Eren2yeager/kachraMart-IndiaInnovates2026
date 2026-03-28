@@ -77,8 +77,14 @@ export async function POST(req: NextRequest) {
       inventoryId: inventory._id.toString(),
     });
 
-    // Reserve inventory by setting reserved: true
-    inventory.reserved = true;
+    // Reduce inventory quantity instead of marking entire record as reserved
+    inventory.quantity -= quantity;
+    
+    // If quantity reaches 0, mark as reserved to hide from marketplace
+    if (inventory.quantity <= 0) {
+      inventory.reserved = true;
+    }
+    
     await inventory.save();
 
     return NextResponse.json(order, { status: 201 });

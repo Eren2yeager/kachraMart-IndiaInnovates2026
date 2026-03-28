@@ -30,11 +30,13 @@ async function aggregateInventory(listing: IWasteListing, hubId: string): Promis
         throw Object.assign(new Error('Hub capacity exceeded'), { status: 400 });
     }
 
+    // Create or update inventory with verified=true (collector delivered it)
     await WasteInventory.findOneAndUpdate(
         { hubId, wasteType: listing.wasteType },
         {
             $inc: { quantity: listing.quantity },
             $addToSet: { sourceListings: listing._id },
+            $set: { verified: true }, // Auto-verify when collector delivers
         },
         { upsert: true, new: true }
     );
@@ -80,13 +82,22 @@ export async function PATCH(
             );
         }
 
-        // If storing in hub and hubId provided, run aggregation before status update
-        if (targetStatus === 'stored_in_hub' && hubId) {
+        // If storing in hub, use assigned hub or provided hubId
+        if (targetStatus === 'stored_in_hub') {
+            const finalHubId = hubId || listing.assignedHubId;
+            
+            if (!finalHubId) {
+                return NextResponse.json(
+                    { error: 'Hub ID is required to store waste' },
+                    { status: 400 }
+                );
+            }
+
             try {
-                await aggregateInventory(listing.toObject() as IWasteListing, hubId);
+                await aggregateInventory(listing.toObject() as IWasteListing, finalHubId);
             } catch (err: any) {
                 return NextResponse.json(
-                    { error: err.message ?? 'Aggregation failed' },
+                    { error: err.message ?? 'Failed to store in hub' },
                     { status: err.status ?? 500 }
                 );
             }

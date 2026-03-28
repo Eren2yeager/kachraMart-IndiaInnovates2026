@@ -41,6 +41,26 @@ export async function GET(req: NextRequest) {
     const orderEngine = new OrderStatisticsEngine();
     const dealerRanking = new DealerRankingSystem();
     
+    // Import models for dashboard stats
+    const Hub = (await import('@/models/Hub')).default;
+    const Order = (await import('@/models/Order')).default;
+    const User = (await import('@/models/User')).default;
+    
+    // Fetch dashboard-specific stats
+    const [totalHubs, totalOrders, pendingOrders, totalUsers] = await Promise.all([
+      Hub.countDocuments(),
+      Order.countDocuments(),
+      Order.countDocuments({ status: 'pending' }),
+      User.countDocuments()
+    ]);
+    
+    // Calculate total revenue from completed orders
+    const revenueResult = await Order.aggregate([
+      { $match: { status: 'completed' } },
+      { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+    ]);
+    const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
+    
     // Fetch all analytics data
     const [
       totalWasteCollected,
@@ -87,7 +107,17 @@ export async function GET(req: NextRequest) {
       lastUpdated: new Date().toISOString()
     };
     
-    return NextResponse.json(analytics);
+    // Add dashboard-specific stats
+    const dashboardStats = {
+      totalHubs,
+      totalOrders,
+      pendingOrders,
+      totalUsers,
+      totalRevenue,
+      ...analytics
+    };
+    
+    return NextResponse.json(dashboardStats);
   } catch (error) {
     console.error('Admin analytics error:', error);
     return NextResponse.json(

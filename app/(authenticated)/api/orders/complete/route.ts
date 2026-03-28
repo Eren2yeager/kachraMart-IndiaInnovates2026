@@ -50,29 +50,11 @@ export async function PATCH(req: NextRequest) {
       const inventory = await WasteInventory.findById(order.inventoryId);
       
       if (inventory) {
-        // Calculate new inventory quantity
-        const newQuantity = inventory.quantity - order.quantity;
-
-        if (newQuantity <= 0) {
-          // Delete inventory if depleted
-          await WasteInventory.findByIdAndDelete(order.inventoryId);
-          
-          // Update hub currentLoad by decrementing the full inventory quantity
-          await Hub.findByIdAndUpdate(inventory.hubId, {
-            $inc: { currentLoad: -inventory.quantity },
-          });
-        } else {
-          // Update inventory quantity and unreserve
-          await WasteInventory.findByIdAndUpdate(order.inventoryId, {
-            quantity: newQuantity,
-            reserved: false,
-          });
-          
-          // Update hub currentLoad by decrementing order quantity
-          await Hub.findByIdAndUpdate(inventory.hubId, {
-            $inc: { currentLoad: -order.quantity },
-          });
-        }
+        // Inventory quantity was already reduced when order was created
+        // Just update hub currentLoad by decrementing order quantity
+        await Hub.findByIdAndUpdate(inventory.hubId, {
+          $inc: { currentLoad: -order.quantity },
+        });
       }
     }
 

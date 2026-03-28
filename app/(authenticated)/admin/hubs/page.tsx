@@ -350,11 +350,22 @@ function HubDetailSheet({
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [newCapacity, setNewCapacity] = useState('');
   const [savingCapacity, setSavingCapacity] = useState(false);
+  
+  // Add inventory state
+  const [addingInventory, setAddingInventory] = useState(false);
+  const [newWasteType, setNewWasteType] = useState<WasteType>('recyclable');
+  const [newQuantity, setNewQuantity] = useState('');
+  const [newVerified, setNewVerified] = useState(true);
+  const [savingInventory, setSavingInventory] = useState(false);
+  const [editingInventory, setEditingInventory] = useState<string | null>(null);
+  const [editQuantity, setEditQuantity] = useState('');
 
   useEffect(() => {
     if (!hub || !open) return;
     setLoadingDetail(true);
     setNewCapacity(String(hub.capacity));
+    setAddingInventory(false);
+    setEditingInventory(null);
     Promise.all([
       fetch(`/api/hubs/${hub._id}`).then((r) => r.json()),
       fetch(`/api/hubs/${hub._id}/analytics`).then((r) => r.json()),
@@ -365,12 +376,141 @@ function HubDetailSheet({
   }, [hub, open]);
 
   const handleVerifyToggle = async (inv: IWasteInventory) => {
+    if (!hub) return;
     // Optimistic update
     setInventory((prev) => prev.map((i) => i._id === inv._id ? { ...i, verified: !i.verified } : i));
     const res = await fetch(`/api/inventory/${inv._id}/verify`, { method: 'PATCH' });
     if (!res.ok) {
       // Revert on failure
       setInventory((prev) => prev.map((i) => i._id === inv._id ? { ...i, verified: inv.verified } : i));
+    }
+  };
+
+  const handleAddInventory = async () => {
+    if (!hub) return;
+    const qty = parseFloat(newQuantity);
+    if (!qty || qty <= 0) return;
+
+    setSavingInventory(true);
+    try {
+      const res = await fetch(`/api/hubs/${hub._id}/inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          wasteType: newWasteType,
+          quantity: qty,
+          verified: newVerified,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to add inventory');
+      }
+
+      const data = await res.json();
+      
+      // Update inventory list
+      setInventory((prev) => {
+        const existing = prev.find((i) => i.wasteType === newWasteType);
+        if (existing) {
+          return prev.map((i) =>
+            i.wasteType === newWasteType
+              ? { ...i, quantity: i.quantity + qty }
+              : i
+          );
+        }
+        return [...prev, data.inventory];
+      });
+
+      // Update hub
+      const updatedHub = {
+        ...hub,
+        currentLoad: hub.currentLoad + qty,
+        utilizationPct: Math.min(100, Math.round(((hub.currentLoad + qty) / hub.capacity) * 1000) / 10),
+      };
+      onUpdated(updatedHub);
+
+      // Reset form
+      setNewQuantity('');
+      setAddingInventory(false);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSavingInventory(false);
+    }
+  };
+
+  const handleUpdateInventory = async (invId: string) => {
+    if (!hub) return;
+    const qty = parseFloat(editQuantity);
+    if (!qty || qty < 0) return;
+
+    const inv = inventory.find((i) => i._id === invId);
+    if (!inv) return;
+
+    const diff = qty - inv.quantity;
+
+    setSavingInventory(true);
+    try {
+      const res = await fetch(`/api/inventory/${invId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: qty }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to update inventory');
+      }
+
+      // Update inventory list
+      setInventory((prev) =>
+        prev.map((i) => (i._id === invId ? { ...i, quantity: qty } : i))
+      );
+
+      // Update hub
+      const updatedHub = {
+        ...hub,
+        currentLoad: hub.currentLoad + diff,
+        utilizationPct: Math.min(100, Math.round(((hub.currentLoad + diff) / hub.capacity) * 1000) / 10),
+      };
+      onUpdated(updatedHub);
+
+      setEditingInventory(null);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSavingInventory(false);
+    }
+  };
+
+  const handleDeleteInventory = async (invId: string) => {
+    if (!hub) return;
+    if (!confirm('Delete this inventory record?')) return;
+
+    const inv = inventory.find((i) => i._id === invId);
+    if (!inv) return;
+
+    try {
+      const res = await fetch(`/api/inventory/${invId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete inventory');
+      }
+
+      // Update inventory list
+      setInventory((prev) => prev.filter((i) => i._id !== invId));
+
+      // Update hub
+      const updatedHub = {
+        ...hub,
+        currentLoad: hub.currentLoad - inv.quantity,
+        utilizationPct: Math.min(100, Math.round(((hub.currentLoad - inv.quantity) / hub.capacity) * 1000) / 10),
+      };
+      onUpdated(updatedHub);
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -440,9 +580,84 @@ function HubDetailSheet({
 
           {/* Inventory table */}
           <div>
-            <h3 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
-              <Package className="h-4 w-4" /> Inventory by Waste Type
-            </h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5">
+                <Package className="h-4 w-4" /> Inventory by Waste Type
+              </h3>
+              {!addingInventory && (
+                <Button size="sm" variant="outline" onClick={() => setAddingInventory(true)}>
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Add
+                </Button>
+              )}
+            </div>
+
+            {/* Add inventory form */}
+            {addingInventory && (
+              <Card className="mb-3 bg-muted/30">
+                <CardContent className="pt-3 pb-3 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Waste Type</Label>
+                      <select
+                        className="w-full h-8 text-xs rounded-md border border-input bg-background px-2"
+                        value={newWasteType}
+                        onChange={(e) => setNewWasteType(e.target.value as WasteType)}
+                      >
+                        {Object.entries(WASTE_TYPES).map(([key, config]) => (
+                          <option key={key} value={key}>
+                            {config.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Quantity (kg)</Label>
+                      <Input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        className="h-8 text-xs"
+                        value={newQuantity}
+                        onChange={(e) => setNewQuantity(e.target.value)}
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={newVerified}
+                      onCheckedChange={setNewVerified}
+                      size="sm"
+                    />
+                    <Label className="text-xs">Mark as verified</Label>
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      size="sm"
+                      className="flex-1 h-7 text-xs"
+                      onClick={handleAddInventory}
+                      disabled={savingInventory || !newQuantity}
+                    >
+                      {savingInventory ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Add Inventory'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        setAddingInventory(false);
+                        setNewQuantity('');
+                      }}
+                      disabled={savingInventory}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {loadingDetail ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full" />)}
@@ -457,6 +672,7 @@ function HubDetailSheet({
                       <th className="text-left px-3 py-2 text-xs font-medium text-muted-foreground">Type</th>
                       <th className="text-right px-3 py-2 text-xs font-medium text-muted-foreground">Qty</th>
                       <th className="text-center px-3 py-2 text-xs font-medium text-muted-foreground">Verified</th>
+                      <th className="text-center px-3 py-2 text-xs font-medium text-muted-foreground">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -473,7 +689,20 @@ function HubDetailSheet({
                             {WASTE_TYPES[inv.wasteType]?.label ?? inv.wasteType}
                           </span>
                         </td>
-                        <td className="px-3 py-2 text-right text-xs">{formatWeight(inv.quantity)}</td>
+                        <td className="px-3 py-2 text-right text-xs">
+                          {editingInventory === inv._id ? (
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              className="h-6 text-xs w-20 ml-auto"
+                              value={editQuantity}
+                              onChange={(e) => setEditQuantity(e.target.value)}
+                            />
+                          ) : (
+                            formatWeight(inv.quantity)
+                          )}
+                        </td>
                         <td className="px-3 py-2 text-center">
                           <div className="flex items-center justify-center gap-1.5">
                             <Switch
@@ -484,6 +713,58 @@ function HubDetailSheet({
                             {inv.verified
                               ? <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
                               : <XCircle className="h-3.5 w-3.5 text-muted-foreground" />}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="flex items-center justify-center gap-1">
+                            {editingInventory === inv._id ? (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => handleUpdateInventory(inv._id)}
+                                  disabled={savingInventory}
+                                >
+                                  {savingInventory ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                  )}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => setEditingInventory(null)}
+                                  disabled={savingInventory}
+                                >
+                                  <XCircle className="h-3 w-3" />
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => {
+                                    setEditingInventory(inv._id);
+                                    setEditQuantity(String(inv.quantity));
+                                  }}
+                                >
+                                  <Edit2 className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0 text-red-500 hover:text-red-600"
+                                  onClick={() => handleDeleteInventory(inv._id)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>

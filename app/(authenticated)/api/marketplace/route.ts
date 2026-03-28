@@ -6,6 +6,7 @@ import Hub from '@/models/Hub';
 import { calculateQualityScore } from '@/lib/qualityScorer';
 import { WASTE_PRICES } from '@/config/constants';
 import { WasteType } from '@/types';
+import mongoose from 'mongoose';
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,7 +32,14 @@ export async function GET(req: NextRequest) {
     };
 
     if (wasteType) filter.wasteType = wasteType;
-    if (hubId) filter.hubId = hubId;
+    if (hubId) {
+      // Convert hubId to ObjectId for proper comparison
+      try {
+        filter.hubId = hubId;
+      } catch (err) {
+        console.error('Invalid hubId format:', err);
+      }
+    }
     if (minQuantity) {
       const minQty = parseFloat(minQuantity);
       if (!isNaN(minQty) && minQty > 0) {

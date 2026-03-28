@@ -58,13 +58,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Call Google Maps Directions API
-    const apiKey = process.env.GOOGLE_MAP_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
     if (!apiKey) {
       // Validates: Requirement 15.2 (Display error message to developer for invalid API key)
       // Validates: Requirement 15.4 (Log errors to console for debugging)
-      console.error('GOOGLE_MAP_API_KEY is not configured in environment variables');
+      console.error('NEXT_PUBLIC_GOOGLE_MAP_API_KEY is not configured in environment variables');
       return NextResponse.json({ 
-        error: 'Map service not configured. Please check GOOGLE_MAP_API_KEY environment variable.' 
+        error: 'Map service not configured. Please check NEXT_PUBLIC_GOOGLE_MAP_API_KEY environment variable.' 
       }, { status: 500 });
     }
 

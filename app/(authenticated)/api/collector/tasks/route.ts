@@ -63,9 +63,9 @@ export async function POST(req: NextRequest) {
     // Calculate route if both locations are available
     if (collectorLocation && pickupLocation) {
       try {
-        const apiKey = process.env.GOOGLE_MAP_API_KEY;
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
         if (!apiKey) {
-          console.warn('GOOGLE_MAP_API_KEY not configured, skipping route calculation');
+          console.warn('NEXT_PUBLIC_GOOGLE_MAP_API_KEY not configured, skipping route calculation');
         } else {
           const [collectorLng, collectorLat] = collectorLocation;
           const [pickupLng, pickupLat] = pickupLocation;

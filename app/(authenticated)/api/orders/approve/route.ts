@@ -49,14 +49,21 @@ export async function PATCH(req: NextRequest) {
     order.status = newStatus;
     await order.save();
 
-    // If rejected, release inventory reservation
+    // If rejected, restore inventory quantity
     if (action === 'reject' && order.inventoryId) {
-      await WasteInventory.findByIdAndUpdate(order.inventoryId, {
-        reserved: false,
-      });
+      const inventory = await WasteInventory.findById(order.inventoryId);
+      if (inventory) {
+        // Add back the ordered quantity
+        inventory.quantity += order.quantity;
+        // Unreserve if it was reserved
+        if (inventory.reserved) {
+          inventory.reserved = false;
+        }
+        await inventory.save();
+      }
     }
 
-    // If approved, maintain reservation (no action needed)
+    // If approved, maintain current state (no action needed)
 
     return NextResponse.json({ order });
   } catch (error) {

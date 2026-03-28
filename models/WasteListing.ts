@@ -48,6 +48,10 @@ const WasteListingSchema = new Schema<IWasteListing>(
       type: String,
       index: true,
     },
+    assignedHubId: {
+      type: String,
+      index: true,
+    },
     aiConfidence: {
       type: Number,
       min: 0,

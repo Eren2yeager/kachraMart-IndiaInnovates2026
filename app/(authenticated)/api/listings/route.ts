@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         // Compute estimated value
         const estimatedValue = quantity * (WASTE_PRICES[wasteType as WasteType] ?? 0);
 
-        // Create listing with pending status
+        // Create listing with pending status (NO auto-assignment)
         const listing = await WasteListing.create({
             userId: session.user.id,
             imageUrl,
@@ -47,45 +47,11 @@ export async function POST(req: NextRequest) {
                 coordinates: pickupLocation.coordinates,
                 address: pickupLocation.address,
             },
-            status: 'pending',
+            status: 'pending', // Stays pending until collector accepts
             aiConfidence,
             description,
             estimatedValue,
         });
-
-        // Auto-assign nearest collector within 50km
-        let assignedCollector = null;
-        try {
-            const nearestCollector = await User.findOne({
-                role: 'collector',
-                location: {
-                    $near: {
-                        $geometry: {
-                            type: 'Point',
-                            coordinates: pickupLocation.coordinates,
-                        },
-                        $maxDistance: 50000, // 50km in meters
-                    },
-                },
-            }).select('_id name phone location');
-
-            if (nearestCollector) {
-                await WasteListing.findByIdAndUpdate(listing._id, {
-                    status: 'collector_assigned',
-                    collectorId: nearestCollector._id.toString(),
-                });
-                listing.status = 'collector_assigned';
-                listing.collectorId = nearestCollector._id.toString();
-                assignedCollector = {
-                    _id: nearestCollector._id.toString(),
-                    name: nearestCollector.name,
-                    phone: nearestCollector.phone,
-                };
-            }
-        } catch (geoError) {
-            // Geospatial query failed (e.g. no 2dsphere index on collectors yet) — listing stays pending
-            console.warn('Collector geo-assignment failed:', geoError);
-        }
 
         return NextResponse.json({
             success: true,
@@ -93,7 +59,6 @@ export async function POST(req: NextRequest) {
                 ...listing.toObject(),
                 _id: listing._id.toString(),
             },
-            collector: assignedCollector,
         }, { status: 201 });
     } catch (error: any) {
         console.error('Create listing error:', error);
@@ -110,7 +75,7 @@ export async function GET(req: NextRequest) {
         }
 
         const { searchParams } = new URL(req.url);
-        const status = searchParams.get('status') as WasteStatus | null;
+        const statusParam = searchParams.get('status');
         const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
         const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? '20')));
         const skip = (page - 1) * limit;
@@ -118,7 +83,16 @@ export async function GET(req: NextRequest) {
         await connectDB();
 
         const filter: Record<string, unknown> = { userId: session.user.id };
-        if (status) filter.status = status;
+        
+        // Handle multiple statuses separated by comma
+        if (statusParam) {
+            const statuses = statusParam.split(',').map(s => s.trim());
+            if (statuses.length === 1) {
+                filter.status = statuses[0];
+            } else {
+                filter.status = { $in: statuses };
+            }
+        }
 
         const [listings, total] = await Promise.all([
             WasteListing.find(filter)
@@ -129,8 +103,22 @@ export async function GET(req: NextRequest) {
             WasteListing.countDocuments(filter),
         ]);
 
+        // Populate collector details for assigned pickups
+        const collectorIds = [...new Set(listings.filter(l => l.collectorId).map(l => l.collectorId))].filter((id): id is string => id !== undefined);
+        const collectors = await User.find({ _id: { $in: collectorIds } })
+            .select('_id name email phone image')
+            .lean();
+        
+        const collectorMap = new Map(collectors.map(c => [c._id.toString(), c]));
+
+        const enrichedListings = listings.map((l) => ({
+            ...l,
+            _id: l._id.toString(),
+            collector: l.collectorId ? collectorMap.get(l.collectorId) || null : null,
+        }));
+
         return NextResponse.json({
-            listings: listings.map((l) => ({ ...l, _id: l._id.toString() })),
+            listings: enrichedListings,
             total,
             page,
             limit,

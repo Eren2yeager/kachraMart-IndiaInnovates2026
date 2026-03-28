@@ -101,7 +101,7 @@ TESTING_GUIDE.md
 
 ### Maps don't load
 - Check that dev server is running
-- Verify `GOOGLE_MAP_API_KEY` in `.env.local` ✅ (already configured)
+- Verify `NEXT_PUBLIC_GOOGLE_MAP_API_KEY` in `.env.local` ✅ (already configured)
 - Check browser console (F12) for errors
 
 ### Markers don't appear

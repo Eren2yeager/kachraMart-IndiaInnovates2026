@@ -25,7 +25,7 @@ export function TopDealersLeaderboard({ data }: TopDealersLeaderboardProps) {
       </div>
       <div className="space-y-3">
         {data.map((dealer, index) => (
-          <div key={dealer.dealerId} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+          <div key={dealer.dealerId} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-black/10">
             <Badge className={getBadgeColor(index + 1)}>
               #{index + 1}
             </Badge>
